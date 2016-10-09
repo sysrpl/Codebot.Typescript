@@ -4,7 +4,7 @@ interface String {
     endsWith(searchString: string, position?: number): boolean;
 }
 
-type BootModule = "greensock" | "jquery";
+type BootModule = "greensock" | "jquery" | "three";
 
 interface Boot {
     open(url: string, onload: (result: string, state?: any) => void, state?: any): void;

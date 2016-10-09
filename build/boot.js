@@ -147,6 +147,10 @@ var Boot = (function () {
             "jquery": {
                 "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js",
                 "identifier": "jQuery"
+            },
+            "three": {
+                "url": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r80/three.min.js",
+                "identifier": "THREE"
             }
         };
         me.moduleCount = me.modules.length;

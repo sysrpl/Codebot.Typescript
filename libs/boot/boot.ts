@@ -36,7 +36,7 @@ if (!String.prototype.endsWith) {
     };
 }
 
-type BootModule = "greensock" | "jquery";
+type BootModule = "greensock" | "jquery" | "three";
 
 class Boot {
     private included = false;
@@ -139,7 +139,7 @@ class Boot {
             }
         }
 
-        let entries = {
+        var entries = {
             "greensock": {
                 "url": "http://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js",
                 "identifier": "TweenMax"
@@ -147,6 +147,10 @@ class Boot {
             "jquery": {
                 "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js",
                 "identifier": "jQuery"
+            },
+            "three": {
+                "url": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r80/three.min.js",
+                "identifier": "THREE"
             }
         };
 
