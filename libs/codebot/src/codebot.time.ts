@@ -65,7 +65,7 @@ Date.prototype.timeAgo = function (): string {
     var seconds = Math.floor(diff / 1000);
     var interval = Math.floor(seconds / 31536000);
     if (interval > 1)
-        return interval + " years ago";
+        return interval + " year(s) ago";
     if (interval == 1)
         return "1 year ago";
     interval = Math.floor(seconds / 2592000);
