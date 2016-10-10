@@ -2,11 +2,13 @@
     "version": "0.1.0",
     "configurations": [
         {
-            "name": "Attach with sourcemaps",
+
+            "name": "Attach to chrome with sourcemap",
             "type": "chrome",
             "request": "attach",
             "port": 9222,
-            "sourceMaps": true
+            "sourceMaps": true,
+            "url": "http://localhost:9000"
         },
         {
             "name": "Attach to url with files served from ./out",

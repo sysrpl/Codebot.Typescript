@@ -106,7 +106,10 @@ function isString(obj: any): obj is string {
   * @param obj Object to check.
  */
 function isNumber(obj: any): obj is number {
-    return typeof (obj) === "number" || obj instanceof Number;
+    let result = typeof obj === "number" || obj instanceof Number;
+    if (result)
+        result = obj != Number.NaN;
+    return result;
 }
 
 /** Type guard for classes.
@@ -123,6 +126,16 @@ function isTypeOf<T>(obj: any, type: { new (): T; }): obj is T {
         return isBoolean(obj);
     return obj instanceof type;
 }
+
+/** Try to convert a type to a number.
+ * @param value The type's value for example "42".
+ * @param defaultValue The value to return if coversion fails (defaults to 0).
+ */
+function tryParseInt(value: any, defaultValue?: number): [boolean, number] {
+    let n = parseInt(value);
+    return isNumber(n) ? [true, n] : [false, isNumber(defaultValue) ? defaultValue : 0];
+}
+
 
 /** Perform an action after a very short delay. */
 function shortDelay(action: Action) {

@@ -148,6 +148,10 @@ var Boot = (function () {
                 "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js",
                 "identifier": "jQuery"
             },
+            "rivets": {
+                "url": "https://cdnjs.cloudflare.com/ajax/libs/rivets/0.9.4/rivets.bundled.min.js",
+                "identifier": "rivets"
+            },
             "three": {
                 "url": "https://cdnjs.cloudflare.com/ajax/libs/three.js/r80/three.min.js",
                 "identifier": "THREE"

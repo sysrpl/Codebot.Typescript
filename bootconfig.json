@@ -3,11 +3,13 @@
         "target": "es5",
         "module": "system",
         "sourceMap": true,
-        "outFile": "build/app.js",
+        "outFile": "build/boot.js",
         "watch": false
     },
     "exclude": [
         "**/*.js",
-        "**/boot/*.ts"
+        "**/app.ts",
+        "**/codebot/src/*.ts",
+        "**/typings/*.d.ts"
     ]
 }
