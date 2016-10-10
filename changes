@@ -1,0 +1,7 @@
+#!/bin/bash
+
+git update-index --assume-unchanged index.html
+git update-index --assume-unchanged index.css
+git update-index --assume-unchanged app.ts
+git update-index --assume-unchanged build/app.js
+git update-index --assume-unchanged build/app.js.map
