@@ -56,9 +56,7 @@ declare namespace Rivets {
             handler?: Function;
         }): void;
 
-        bind(element: HTMLElement, models: Object, options?: Object): View;
-        bind(element: JQuery, models: Object, options?: Object): View;
-        bind(element: Array<HTMLElement>, models: Object, options?: Object): View;
+        bind(element: any, models: Object, options?: Object): View;
     }
 }
 
