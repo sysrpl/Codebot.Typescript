@@ -3,13 +3,13 @@
         "target": "es5",
         "module": "system",
         "sourceMap": true,
-        "outFile": "build/boot.js",
+        "declaration": true,
+        "declarationDir": "typescript/typings",
+        "outDir": "build",
+        "stripInternal": true,
         "watch": false
     },
-    "exclude": [
-        "**/*.js",
-        "**/app.ts",
-        "**/codebot/src/*.ts",
-        "**/typings/*.d.ts"
+    "files": [
+        "typescript/boot/boot.ts"
     ]
 }

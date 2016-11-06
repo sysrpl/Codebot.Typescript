@@ -4,10 +4,12 @@
         "module": "system",
         "sourceMap": true,
         "outFile": "build/app.js",
+        "removeComments": true,
         "watch": false
     },
-    "exclude": [
-        "**/*.js",
-        "**/boot/*.ts"
+    "include": [
+        "**/app/*.ts",
+        "**/codebot/*.ts",
+        "**/*.d.ts"
     ]
 }
