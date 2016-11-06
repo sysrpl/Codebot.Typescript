@@ -1,3 +1,11 @@
+function get(query: string): HTMLElement {
+    return document.querySelector(query) as HTMLElement;
+}
+
+function getAll(query: string): Array<HTMLElement> {
+    return [].slice.call(document.querySelectorAll(query));
+}
+
 interface String {
     includes(search: string, start?: number): boolean;
     startsWith(searchString: string, position?: number): boolean;
@@ -36,23 +44,36 @@ if (!String.prototype.endsWith) {
     };
 }
 
-type BootModule = "greensock" | "jquery" | "rivets" | "three";
+type BootModule = "ace" | "greensock" | "jquery" | "rivets" | "three";
 
 class Boot {
+    /** @internal */
     private included = false;
+    /** @internal */
     private loaded = false;
+    /** @internal */
     private requestCount = 0;
+    /** @internal */
     private sources = [];
+    /** @internal */
     private moduleCount = 0;
+    /** @internal */
     private modules = [];
+    /** @internal */
+    private requireCount = 0;
+    /** @internal */
+    private requires = [];
 
+    /** @internal */
     private start(): void {
         if (this.included && this.loaded) {
             if (typeof window["main"] === "function")
-                window["main"]();
+                console.log("started");
+            window["main"]();
         }
     }
 
+    /** @internal */
     private processIncludes(): void {
         let me = this;
 
@@ -119,33 +140,29 @@ class Boot {
         }
     }
 
-    open(url: string, onload: (result: string, state?: any) => void, state?: any): void {
-        let request = new XMLHttpRequest();
-        request.open("GET", url, true);
-        request.onload = () => {
-            onload(request.response, state);
-        }
-        request.send();
-    }
-
+    /** @internal */
     private processUses(): void {
         let me = this;
 
         function load() {
             me.moduleCount--;
             if (me.moduleCount == 0) {
-                me.loaded = true;
-                me.start();
+                /*me.loaded = true; me.start();*/
+                me.processsRequires();
             }
         }
 
         var entries = {
+            "ace": {
+                "url": "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js",
+                "identifier": "Ace"
+            },
             "greensock": {
                 "url": "http://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js",
                 "identifier": "TweenMax"
             },
             "jquery": {
-                "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js",
+                "url": "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js",
                 "identifier": "jQuery"
             },
             "rivets": {
@@ -179,13 +196,50 @@ class Boot {
         }
     }
 
-    use(module: BootModule | Array<BootModule>): void {
-        let items = Array.isArray(module) ? module : [module];
-        for (let item of items)
-            if (this.modules.indexOf(item) < 0)
-                this.modules.push(item);
+    /** @internal */
+    private processsRequires(): void {
+        let me = this;
+
+        function load() {
+            me.requireCount--;
+            if (me.requireCount == 0) {
+                me.loaded = true;
+                me.start();
+            }
+        }
+
+        me.requireCount = me.requires.length;
+        if (me.requireCount == 0) {
+            me.requireCount = 1;
+            load();
+            return;
+        }
+        for (let src of me.requires) {
+            if (!src || window[src] || me.sources.indexOf(src) > -1) {
+                load();
+                continue;
+            }
+            me.sources.push(src);
+            let script = document.createElement("script");
+            script.type = "text/javascript";
+            script.onload = () => { load(); }
+            document.body.appendChild(script);
+            script.src = src;
+        }
     }
 
+    /** @internal */
+    private app(): string {
+        let metas = document.getElementsByTagName("meta");
+        for (let i = 0; i < metas.length; i++) {
+            let meta = metas[i];
+            if (meta.getAttribute("name") == "boot")
+                return meta.getAttribute("content");
+        }
+        return "/build/app.js";
+    }
+
+    /** @internal */
     constructor() {
         if (window["boot"])
             return;
@@ -197,8 +251,29 @@ class Boot {
             script.type = "text/javascript";
             script.onload = () => me.processUses();
             document.body.appendChild(script);
-            script.src = "build/app.js";
+            script.src = this.app();
         });
+    }
+
+    open(url: string, onload: (result: string, state?: any) => void, state?: any): void {
+        let request = new XMLHttpRequest();
+        request.open("GET", url, true);
+        request.onload = () => {
+            onload(request.response, state);
+        }
+        request.send();
+    }
+
+    require(script: string): void {
+        if (this.requires.indexOf(script) < 0)
+            this.requires.push(script);
+    }
+
+    use(module: BootModule | Array<BootModule>): void {
+        let items = Array.isArray(module) ? module : [module];
+        for (let item of items)
+            if (this.modules.indexOf(item) < 0)
+                this.modules.push(item);
     }
 }
 

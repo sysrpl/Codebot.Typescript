@@ -31,6 +31,24 @@ Array.prototype.__defineGetter__("first", function () {
 	return this[0];
 });
 
+interface Date {
+    addMinutes(minutes: number): Date;    
+    addHours(hours: number): Date;    
+    addDays(days: number): Date;
+}
+
+Date.prototype.addMinutes = function (minutes) {
+    return new Date(this.getTime() + minutes * 60000);
+}
+
+Date.prototype.addHours = function (hours) {
+    return new Date(this.getTime() + hours * 60 * 60000);
+}
+
+Date.prototype.addDays = function (days) {
+    return new Date(this.getTime() + days * 24 * 60 * 60000);
+}
+
 interface Rect {
     x: number;
     y: number;
@@ -44,6 +62,7 @@ interface Point {
 }
 
 type Action = () => void;
+type Handler<T> = (t: T) => void;
 type Func<T> = () => T;
 type Ctor<T> = { new (): T; };
 type Nullable<T> = T | undefined | void;

@@ -1,27 +1,18 @@
 function main() {
     "Hello World".writeLine();
 }
-/** The static Test class can be used to aide in unit testing. */
 var Test = (function () {
     function Test() {
     }
-    /** Test a condition and write the result.
-     * @param condition The test result being considered.
-     * @param name The name associated with the condition.
-    */
     Test.verify = function (condition, name) {
         Test.writeLine(name, ": ", condition ? "success" : "fail");
     };
-    /** Write a break and an optional new heading section to a document.
-     * @param message Optional heading text.
-     */
     Test.writeBreak = function (message) {
         var h2 = document.createElement("h2");
         if (message)
             h2.innerText = message;
         document.body.appendChild(h2);
     };
-    /** Write lines of text to a document. */
     Test.writeLine = function () {
         var content = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -33,11 +24,6 @@ var Test = (function () {
     };
     return Test;
 }());
-/** Add a cookie to the client if allowed.
- * @param name The name used to identify the cookie.
- * @param value The value stored associated with the name.
- * @param days The number of days the cookie persists.
- */
 function addCookie(name, value, days) {
     var expires;
     if (days) {
@@ -50,15 +36,9 @@ function addCookie(name, value, days) {
         expires = "";
     document.cookie = name + "=" + value + expires + "; path=/";
 }
-/** Remove a cookie from the client.
- * @param name The name of the cookie to be removed.
- */
 function removeCookie(name) {
     addCookie(name, "", -1);
 }
-/** Read the value of a cookie from the client.
- * @param name The name of the cookie to be read.
- */
 function readCookie(name) {
     name += "=";
     var cookies = document.cookie.split(';');
@@ -122,9 +102,6 @@ HTMLElement.prototype.__defineGetter__("bounds", function () {
     var rect = this.getBoundingClientRect();
     return { x: rect.left, y: rect.top, width: rect.width, height: rect.height };
 });
-/** Find script node inside an HTMLElement object and executes them.
- * @param element The HTMLElement object to search.
-*/
 function executeScripts(element) {
     function nodeNameEquals(elem, name) {
         return elem.nodeName && elem.nodeName.toUpperCase() == name.toUpperCase();
@@ -157,10 +134,6 @@ function executeScripts(element) {
         evalScript(scripts[i]);
     }
 }
-/** Load a javascript file asynchronously.
- * @param url The content delivery resource for the script.
- * @param callback Notification of when a script has completely loaded.
- */
 function loadScript(url, callback) {
     var script = document.createElement("script");
     script.type = "text/javascript";
@@ -175,9 +148,6 @@ function loadScript(url, callback) {
     var node = document.getElementsByTagName("script")[0];
     node.parentNode.insertBefore(script, node);
 }
-/** Query the DOM using a selector and return a single HTMLElement.
- * @param query The selector text.
- */
 function getElement(query) {
     if (isString(query))
         return document.querySelector(query);
@@ -186,9 +156,6 @@ function getElement(query) {
     else
         return query[0];
 }
-/** Query the DOM using a selector and return all matching HTMLElements.
- * @param query The selector text.
- */
 function getElements(query) {
     if (isString(query)) {
         var nodes = document.querySelectorAll(query);
@@ -199,10 +166,6 @@ function getElements(query) {
     else
         return query;
 }
-/** Sets the style on one or more HTMLElements.
- * @param query The selector or elements to modify.
- * @param styles A list of styles and values to be set.
- */
 function setStyle(query, styles) {
     var elements = getElements(query);
     var keys = Object.keys(styles);
@@ -216,10 +179,6 @@ function setStyle(query, styles) {
         }
     }
 }
-/** Removes one or more inline styles from HTMLElements.
- * @param query The selector or elements to modify.
- * @param styles A list of styles names such as "margin-left" and "background-color".
- */
 function removeStyle(query, styles) {
     var items = isString(styles) ? styles.splitTrim(" ") : styles;
     var elements = getElements(query);
@@ -240,17 +199,9 @@ function removeStyle(query, styles) {
         }
     }
 }
-/** Type guard for objects supporting addEventListener.
- * @param obj The object to test.
- */
 function isEventCapable(obj) {
     return isDefined(obj["addEventListener"]);
 }
-/** Attach an event listener to zero or more objects.
- * @param query The objects to attach the event.
- * @param name The name of the event to attach (for example "load", "resize", ect).
- * @param event The event handler to be invoked.
- */
 function addEvent(query, name, event) {
     var items = isEventCapable(query) ? [query] : getElements(query);
     for (var _i = 0, items_5 = items; _i < items_5.length; _i++) {
@@ -258,10 +209,6 @@ function addEvent(query, name, event) {
         item.addEventListener(name, event);
     }
 }
-/** Add a value to the class attribute to zero or more HTMLElements.
- * @param query The objects to modify,
- * @param value One or more values to add.
- */
 function addClass(query, value) {
     var items = getElements(query);
     for (var _i = 0, items_6 = items; _i < items_6.length; _i++) {
@@ -269,11 +216,6 @@ function addClass(query, value) {
         e.addClass(value);
     }
 }
-/** Remove a value from the class attribute to zero or more HTMLElements.
- * @param query The objects to modify,
- * @param value One or more values to remove.
- *
- */
 function removeClass(query, value) {
     var items = getElements(query);
     for (var _i = 0, items_7 = items; _i < items_7.length; _i++) {
@@ -281,7 +223,6 @@ function removeClass(query, value) {
         e.removeClass(value);
     }
 }
-/** LocalCache is used by the Request object to capture responses.*/
 var LocalCache = (function () {
     function LocalCache() {
         this.data = {};
@@ -300,7 +241,6 @@ var LocalCache = (function () {
     };
     return LocalCache;
 }());
-/** Request handles asynchronous http 'get' and 'post' requests. */
 var Request = (function () {
     function Request() {
         this.localCache = new LocalCache();
@@ -318,66 +258,46 @@ var Request = (function () {
         this.callback(this);
     };
     Request.prototype.httpRequestChange = function () {
-        if (this.posting)
-            return;
         if (this.httpRequest.readyState == 4 && this.httpRequest.status == 200) {
             this.sendComplete(this.httpRequest.responseText);
         }
     };
-    /** Perform an asynchronous http get request.
-     * @param url The endpoint for the requested resource.
-     * @param callback Your notification invoked after request completes successfully.
-     * @param cache When cache is true responses are reused for each distinct url.
-     */
     Request.prototype.send = function (url, callback, cache) {
         this.httpRequest.abort();
-        this.posting = false;
-        this.httpRequest.open("GET", url);
         this.url = url;
         this.callback = callback;
         this.cache = cache;
         if (cache && this.localCache.exists(url))
             this.sendComplete(this.localCache.recall(url));
-        else
+        else {
+            this.httpRequest.open("GET", url);
             this.httpRequest.send();
+        }
     };
-    /** Perform an asynchronous http post request.
-     * @param url The endpoint for the requested resource.
-     * @param data Data posted to recipient enpoint.
-     */
-    Request.prototype.post = function (url, data) {
+    Request.prototype.post = function (url, data, callback, cache) {
         this.httpRequest.abort();
-        this.posting = true;
         this.url = url;
-        this.callback = undefined;
-        this.cache = false;
-        this.httpRequest.open("POST", url);
-        this.httpRequest.send(data);
+        this.callback = callback;
+        this.cache = cache;
+        if (cache && this.localCache.exists(url))
+            this.sendComplete(this.localCache.recall(url));
+        else {
+            this.httpRequest.open("POST", url);
+            this.httpRequest.send(data);
+        }
     };
-    /** Cancel any pending send or post operations.
-     * @param url The endpoint for the requested resource.
-     * @param data Data posted to recipient enpoint.
-     */
     Request.prototype.cancel = function () {
         this.httpRequest.abort();
     };
     return Request;
 }());
-/** Perform a one off asynchronous http get request.
- * @param url The endpoint for the requested resource.
- * @param callback Your notification invoked after the request completes successfully.
- */
 function sendRequest(url, callback) {
     var r = new Request();
     r.send(url, callback);
 }
-/** Perform a one off asynchronous http post request.
- * @param url The endpoint for the requested resource.
- * @param data Data posted to recipient enpoint.
- */
-function postRequest(url, data) {
+function postRequest(url, data, callback) {
     var r = new Request();
-    r.post(url, data);
+    r.post(url, data, callback);
 }
 Array.prototype.contains = function (value) {
     return this.indexOf(value) > -1;
@@ -396,61 +316,45 @@ Array.prototype.shuffle = function () {
 Array.prototype.__defineGetter__("first", function () {
     return this[0];
 });
-/** Returns true if a value is not undefined and not null.
- * @param obj The value to test.
- */
+Date.prototype.addMinutes = function (minutes) {
+    return new Date(this.getTime() + minutes * 60000);
+};
+Date.prototype.addHours = function (hours) {
+    return new Date(this.getTime() + hours * 60 * 60000);
+};
+Date.prototype.addDays = function (days) {
+    return new Date(this.getTime() + days * 24 * 60 * 60000);
+};
 function isDefined(obj) {
     return obj !== undefined && obj !== null;
 }
-/** Returns true if a value is undefined or null.
- * @param obj The value to test.
- */
 function isUndefined(obj) {
     return obj === undefined || obj === null;
 }
-/** Return true if the device is a tablet or phone. */
 function isMobile() {
     return isDefined(window.orientation);
 }
-/** Return true if the device is a desktop browser. */
 function isDesktop() {
     return isUndefined(window.orientation);
 }
-/** Returns a default value if a value is undefined or null.
- * @param obj The value to test.
- * @param defaultValue The value to return if obj is undefined or null.
- */
 function getDefault(obj, defaultValue) {
     return isDefined(obj) ? obj : defaultValue;
 }
-/** Returns true if an object is an array.
- * @param obj Object to check.
- */
 function isArray(obj) {
     return Array.isArray(obj);
 }
-/** Type guard for Boolean.
- * @param obj Object to check.
- */
 function isBoolean(obj) {
     return typeof (obj) === "boolean" || obj instanceof Boolean;
 }
-/** Type guard for String.
- * @param obj Object to check.
- */
 function isString(obj) {
     return typeof (obj) === "string" || obj instanceof String;
 }
-/** Type guard for Number.
-  * @param obj Object to check.
- */
 function isNumber(obj) {
-    return typeof (obj) === "number" || obj instanceof Number;
+    var result = typeof obj === "number" || obj instanceof Number;
+    if (result)
+        result = obj != Number.NaN;
+    return result;
 }
-/** Type guard for classes.
-  * @param obj Object to check.
-  * @param type Type check (eg. String HTMLElement, Date ect).
-  */
 function isTypeOf(obj, type) {
     var t = type;
     if (t.name === "String")
@@ -461,12 +365,14 @@ function isTypeOf(obj, type) {
         return isBoolean(obj);
     return obj instanceof type;
 }
-/** Perform an action after a very short delay. */
+function tryParseInt(value, defaultValue) {
+    var n = parseInt(value);
+    return isNumber(n) ? [true, n] : [false, isNumber(defaultValue) ? defaultValue : 0];
+}
 function shortDelay(action) {
     window.setTimeout(action, 10);
 }
 function initTouch() {
-    // TODO: add all touch events
     function translateTouchMove(event) {
         var touch = event.changedTouches[0];
         var mouseEvent = document.createEvent("MouseEvent");
@@ -552,7 +458,7 @@ Date.prototype.timeAgo = function () {
     var seconds = Math.floor(diff / 1000);
     var interval = Math.floor(seconds / 31536000);
     if (interval > 1)
-        return interval + " years ago";
+        return interval + " year(s) ago";
     if (interval == 1)
         return "1 year ago";
     interval = Math.floor(seconds / 2592000);

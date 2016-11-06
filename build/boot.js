@@ -1,3 +1,9 @@
+function get(query) {
+    return document.querySelector(query);
+}
+function getAll(query) {
+    return [].slice.call(document.querySelectorAll(query));
+}
 if (!String.prototype.includes) {
     String.prototype.includes = function (search, start) {
         if (typeof start !== 'number') {
@@ -29,13 +35,25 @@ if (!String.prototype.endsWith) {
     };
 }
 var Boot = (function () {
+    /** @internal */
     function Boot() {
+        var _this = this;
+        /** @internal */
         this.included = false;
+        /** @internal */
         this.loaded = false;
+        /** @internal */
         this.requestCount = 0;
+        /** @internal */
         this.sources = [];
+        /** @internal */
         this.moduleCount = 0;
+        /** @internal */
         this.modules = [];
+        /** @internal */
+        this.requireCount = 0;
+        /** @internal */
+        this.requires = [];
         if (window["boot"])
             return;
         var me = this;
@@ -46,15 +64,18 @@ var Boot = (function () {
             script.type = "text/javascript";
             script.onload = function () { return me.processUses(); };
             document.body.appendChild(script);
-            script.src = "build/app.js";
+            script.src = _this.app();
         });
     }
+    /** @internal */
     Boot.prototype.start = function () {
         if (this.included && this.loaded) {
             if (typeof window["main"] === "function")
-                window["main"]();
+                console.log("started");
+            window["main"]();
         }
     };
+    /** @internal */
     Boot.prototype.processIncludes = function () {
         var me = this;
         function slice(items) {
@@ -122,30 +143,27 @@ var Boot = (function () {
             _loop_1(item);
         }
     };
-    Boot.prototype.open = function (url, onload, state) {
-        var request = new XMLHttpRequest();
-        request.open("GET", url, true);
-        request.onload = function () {
-            onload(request.response, state);
-        };
-        request.send();
-    };
+    /** @internal */
     Boot.prototype.processUses = function () {
         var me = this;
         function load() {
             me.moduleCount--;
             if (me.moduleCount == 0) {
-                me.loaded = true;
-                me.start();
+                /*me.loaded = true; me.start();*/
+                me.processsRequires();
             }
         }
         var entries = {
+            "ace": {
+                "url": "https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.5/ace.js",
+                "identifier": "Ace"
+            },
             "greensock": {
                 "url": "http://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.0/TweenMax.min.js",
                 "identifier": "TweenMax"
             },
             "jquery": {
-                "url": "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js",
+                "url": "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js",
                 "identifier": "jQuery"
             },
             "rivets": {
@@ -177,6 +195,58 @@ var Boot = (function () {
             document.body.appendChild(script);
             script.src = module.url;
         }
+    };
+    /** @internal */
+    Boot.prototype.processsRequires = function () {
+        var me = this;
+        function load() {
+            me.requireCount--;
+            if (me.requireCount == 0) {
+                me.loaded = true;
+                me.start();
+            }
+        }
+        me.requireCount = me.requires.length;
+        if (me.requireCount == 0) {
+            me.requireCount = 1;
+            load();
+            return;
+        }
+        for (var _i = 0, _a = me.requires; _i < _a.length; _i++) {
+            var src = _a[_i];
+            if (!src || window[src] || me.sources.indexOf(src) > -1) {
+                load();
+                continue;
+            }
+            me.sources.push(src);
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.onload = function () { load(); };
+            document.body.appendChild(script);
+            script.src = src;
+        }
+    };
+    /** @internal */
+    Boot.prototype.app = function () {
+        var metas = document.getElementsByTagName("meta");
+        for (var i = 0; i < metas.length; i++) {
+            var meta = metas[i];
+            if (meta.getAttribute("name") == "boot")
+                return meta.getAttribute("content");
+        }
+        return "/build/app.js";
+    };
+    Boot.prototype.open = function (url, onload, state) {
+        var request = new XMLHttpRequest();
+        request.open("GET", url, true);
+        request.onload = function () {
+            onload(request.response, state);
+        };
+        request.send();
+    };
+    Boot.prototype.require = function (script) {
+        if (this.requires.indexOf(script) < 0)
+            this.requires.push(script);
     };
     Boot.prototype.use = function (module) {
         var items = Array.isArray(module) ? module : [module];

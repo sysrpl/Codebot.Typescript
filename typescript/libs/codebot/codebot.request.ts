@@ -36,8 +36,6 @@ class Request {
     }
 
     private httpRequestChange() {
-        if (this.posting)
-            return;
         if (this.httpRequest.readyState == 4 && this.httpRequest.status == 200) {
             this.sendComplete(this.httpRequest.responseText);
         }
@@ -65,29 +63,32 @@ class Request {
      */
     send(url: string, callback: RequestCallback, cache?: boolean): void {
         this.httpRequest.abort();
-        this.posting = false;
-        this.httpRequest.open("GET", url);
         this.url = url;
         this.callback = callback;
         this.cache = cache;
         if (cache && this.localCache.exists(url))
             this.sendComplete(this.localCache.recall(url));
-        else
+        else {
+            this.httpRequest.open("GET", url);
             this.httpRequest.send();
+        }
     }
 
     /** Perform an asynchronous http post request.
      * @param url The endpoint for the requested resource.
      * @param data Data posted to recipient enpoint.
      */
-    post(url: string, data: string): void {
+    post(url: string, data: string, callback?: RequestCallback, cache?: boolean): void {
         this.httpRequest.abort();
-        this.posting = true;
         this.url = url;
-        this.callback = undefined;
-        this.cache = false;
-        this.httpRequest.open("POST", url);
-        this.httpRequest.send(data);
+        this.callback = callback;
+        this.cache = cache;
+        if (cache && this.localCache.exists(url))
+            this.sendComplete(this.localCache.recall(url));
+        else {
+            this.httpRequest.open("POST", url);
+            this.httpRequest.send(data);
+        }
     }
 
     /** Cancel any pending send or post operations.
@@ -115,7 +116,7 @@ function sendRequest(url: string, callback: RequestCallback) {
  * @param url The endpoint for the requested resource.
  * @param data Data posted to recipient enpoint.
  */
-function postRequest(url: string, data: string) {
+function postRequest(url: string, data: string, callback?: RequestCallback) {
     let r = new Request();
-    r.post(url, data);
+    r.post(url, data, callback);
 }
