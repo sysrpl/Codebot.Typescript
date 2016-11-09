@@ -5,4 +5,17 @@
     //    "**/*.js": true,
     //    "**/*.map": true
    //}
+   "files.exclude": {
+       ".gitignore": true,
+       "**/*.csproj": true,
+       "**/*.asax": true,
+       "**/*.ashx": true,
+       "**/*.cs": true,
+       "**/*.iso": true,
+       "**/bin": true,
+       "**/obj": true,
+       "**/resources": true,
+       "**/LICENSE": true,
+       "**/README.md": true
+   }
 }
