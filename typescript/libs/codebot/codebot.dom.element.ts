@@ -124,7 +124,7 @@ function executeScripts(element: HTMLElement) {
  * @param url The content delivery resource for the script.
  * @param callback Notification of when a script has completely loaded.
  */
-function loadScript(url: string, callback: Action): void {
+function loadScript(url: string, callback: Proc): void {
     let script = document.createElement("script");
     script.type = "text/javascript";
     script.src = url;

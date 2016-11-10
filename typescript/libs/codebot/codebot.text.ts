@@ -1,6 +1,8 @@
 interface String {
     /** Append the String object to the document body. */
     writeLine(): void;
+    /** Returns a hash of the string. */
+    hashCode(): number;
     /** Returns true if the String object is empty or whitespace. */
     isEmpty(): boolean;
     /** Split a String object into a trimmed array of strings.
@@ -13,6 +15,17 @@ interface String {
 
 String.prototype.writeLine = function (): void {
     Test.writeLine(this);
+}
+
+String.prototype.hashCode = function() {
+    let hash = 0;
+    if (this.length == 0) return hash;
+    for (var i = 0; i < this.length; i++) {
+        var character = this.charCodeAt(i);
+        hash = ((hash<<5)-hash)+character;
+        hash = hash & hash; 
+    }
+    return hash;
 }
 
 String.prototype.isEmpty = function () {
@@ -34,4 +47,12 @@ String.prototype.format = function (...args: any[]) {
     return this.replace(/{(\d+)}/g, function (match, number) {
         return typeof args[number] != 'undefined' ? args[number] : match;
     });
+}
+
+interface Number {
+    withCommas(): string;
+}
+
+Number.prototype.withCommas = function () {
+    return this.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");;
 }

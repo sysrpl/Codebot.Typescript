@@ -61,8 +61,8 @@ interface Point {
     y: number;
 }
 
-type Action = () => void;
-type Handler<T> = (t: T) => void;
+type Proc = () => void;
+type Action<T> = (t: T) => void;
 type Func<T> = () => T;
 type Ctor<T> = { new (): T; };
 type Nullable<T> = T | undefined | void;
@@ -157,8 +157,8 @@ function tryParseInt(value: any, defaultValue?: number): [boolean, number] {
 
 
 /** Perform an action after a very short delay. */
-function shortDelay(action: Action) {
-    window.setTimeout(action, 10);
+function shortDelay(proc: Proc) {
+    window.setTimeout(proc, 10);
 }
 
 function initTouch() {
