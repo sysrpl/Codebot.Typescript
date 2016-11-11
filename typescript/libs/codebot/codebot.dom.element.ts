@@ -125,18 +125,18 @@ function executeScripts(element: HTMLElement) {
  * @param callback Notification of when a script has completely loaded.
  */
 function loadScript(url: string, callback: Proc): void {
-    let script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = url;
-    let loaded = false;
-    script.onload = script["onreadystatechange"] = function () {
-        if (!loaded && (!this.readyState || this.readyState == "complete")) {
-            loaded = true;
-            callback();
-        }
-    }
-    let node = document.getElementsByTagName("script")[0];
-    node.parentNode.insertBefore(script, node);
+	let script = document.createElement("script");
+	script.type = "text/javascript";
+	script.src = url;
+	let loaded = false;
+	script.onload = script["onreadystatechange"] = function () {
+		if (!loaded && (!this.readyState || this.readyState == "complete")) {
+			loaded = true;
+			callback();
+		}
+	}
+	let node = document.getElementsByTagName("script")[0];
+	node.parentNode.insertBefore(script, node);
 }
 
 /** A query selector string or one or more HTMLElements. */
@@ -156,6 +156,7 @@ function getElement(query: QuerySelect): HTMLElement {
 
 /** Query the DOM using a selector and return all matching HTMLElements.
  * @param query The selector text.
+ * @returns An array of HTMLElements.
  */
 function getElements(query: QuerySelect): Array<HTMLElement> {
 	if (isString(query)) {
@@ -174,7 +175,7 @@ function getElements(query: QuerySelect): Array<HTMLElement> {
  */
 function setStyle(query: QuerySelect, styles: any): void {
 	let elements = getElements(query);
-	var keys = Object.keys(styles);
+	let keys = Object.keys(styles);
 	for (let e of elements) {
 		let style = e.style;
 		for (let k of keys) {
