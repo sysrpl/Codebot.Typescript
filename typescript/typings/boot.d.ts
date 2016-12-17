@@ -1,5 +1,10 @@
-declare function get(query: string): HTMLElement;
-declare function getAll(query: string): Array<HTMLElement>;
+declare type QuerySelect = string | HTMLElement | Array<HTMLElement>;
+declare function get(query: QuerySelect): HTMLElement;
+declare function getAll(query: QuerySelect): Array<HTMLElement>;
+interface HTMLElement {
+    get(query: QuerySelect): HTMLElement;
+    getAll(query: QuerySelect): Array<HTMLElement>;
+}
 interface String {
     includes(search: string, start?: number): boolean;
     startsWith(searchString: string, position?: number): boolean;

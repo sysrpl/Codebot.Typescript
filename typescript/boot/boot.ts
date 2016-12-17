@@ -1,9 +1,44 @@
-function get(query: string): HTMLElement {
-    return document.querySelector(query) as HTMLElement;
+type QuerySelect = string | HTMLElement | Array<HTMLElement>;
+
+function get(query: QuerySelect): HTMLElement {
+    if (typeof query == "string")
+        return document.querySelector(query) as HTMLElement;
+    if (query instanceof HTMLElement)
+        return query;
+    return query[0];
 }
 
-function getAll(query: string): Array<HTMLElement> {
-    return [].slice.call(document.querySelectorAll(query));
+function getAll(query: QuerySelect): Array<HTMLElement> {
+    if (typeof query == "string") {
+        let nodes: any = document.querySelectorAll(query);
+        return Array.prototype.slice.call(nodes);
+    }
+    if (query instanceof HTMLElement)
+        return [query];
+    return query;
+}
+
+interface HTMLElement {
+    get(query: QuerySelect): HTMLElement;
+    getAll(query: QuerySelect): Array<HTMLElement>;
+}
+
+HTMLElement.prototype.get = function (query: QuerySelect): HTMLElement {
+    if (typeof query == "string")
+        return this.querySelector(query) as HTMLElement;
+    if (query instanceof HTMLElement)
+        return query;
+    return query[0];
+}
+
+HTMLElement.prototype.getAll = function (query: QuerySelect): Array<HTMLElement> {
+    if (typeof query == "string") {
+        let nodes: any = this.querySelectorAll(query);
+        return Array.prototype.slice.call(nodes);
+    }
+    if (query instanceof HTMLElement)
+        return [query];
+    return query;
 }
 
 interface String {
@@ -67,15 +102,24 @@ class Boot {
     /** @internal */
     private start(): void {
         if (this.included && this.loaded) {
-            if (typeof window["main"] === "function")
+            if (typeof window["main"] === "function") {
                 console.log("started");
-            window["main"]();
+                window["main"]();
+            }
         }
     }
 
     /** @internal */
     private processIncludes(): void {
         let me = this;
+
+        function InvalidTarget(element: HTMLElement): boolean {
+            let target = element.getAttribute("target-platform");
+            if (target == undefined || target.length < 1)
+                return false;
+            let desktop = typeof window.orientation == "undefined";
+            return target == "mobile" ? desktop : !desktop; 
+        }
 
         function slice(items): Array<HTMLElement> {
             return Array.prototype.slice.call(items);
@@ -98,7 +142,7 @@ class Boot {
             var src = item.getAttribute("src");
             if (src.endsWith(".css")) {
                 item.parentNode.removeChild(item);
-                if (me.sources.indexOf(src) > -1) {
+                if (me.sources.indexOf(src) > -1 || InvalidTarget(item)) {
                     load();
                     continue;
                 }
@@ -112,7 +156,7 @@ class Boot {
             }
             else if (src.endsWith(".js")) {
                 item.parentNode.removeChild(item);
-                if (me.sources.indexOf(src) > -1) {
+                if (me.sources.indexOf(src) > -1 || InvalidTarget(item)) {
                     load();
                     continue;
                 }

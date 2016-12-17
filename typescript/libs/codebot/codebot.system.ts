@@ -1,6 +1,39 @@
+/** Key codes */
+enum Key {
+    Backspace = 8,
+    Tab = 9,
+    Enter = 13,
+    Shift = 16,
+    Ctrl = 17,
+    Alt = 18,
+    Pause = 19,
+    CapsLock = 20,
+    Escape = 27,
+    Space = 32,
+    PageUp = 33,
+    PageDown = 34,
+    Left = 37,
+    Up = 38,
+    Right = 39,
+    Down = 40,
+    Insert = 45,
+    Delete = 46,
+    F1 = 112,
+    F2 = 113,
+    F3 = 114,
+    F4 = 115,
+    F5 = 116,
+    F7 = 117,
+    F8 = 118,
+    F9 = 119,
+    F10 = 120,
+    F11 = 121,
+    F12 = 122
+}
+
 interface Array<T> {
-	__defineGetter__: any;
-	__defineSetter__: any;
+    __defineGetter__: any;
+    __defineSetter__: any;
     /** Returns true if the array has an item matching a value.
      * @param value The value of the item to locate.
      */
@@ -28,12 +61,12 @@ Array.prototype.shuffle = function () {
 }
 
 Array.prototype.__defineGetter__("first", function () {
-	return this[0];
+    return this[0];
 });
 
 interface Date {
-    addMinutes(minutes: number): Date;    
-    addHours(hours: number): Date;    
+    addMinutes(minutes: number): Date;
+    addHours(hours: number): Date;
     addDays(days: number): Date;
 }
 
@@ -106,7 +139,6 @@ function isArray(obj: any): boolean {
     return Array.isArray(obj);
 }
 
-
 /** Type guard for Boolean.
  * @param obj Object to check.
  */
@@ -178,4 +210,13 @@ function initTouch() {
     }
 
     document.addEventListener("touchmove", translateTouchMove, true);
+}
+
+/** Returns the base part of the url e.g. https://sub.example.com  */
+function baseUrl(): string {
+    let proto = window.location.protocol || document.location.protocol;
+    let port = location.port;
+    if (port.length)
+        port = `:${port}`;
+    return `${proto}//${document.domain}${port}`;
 }

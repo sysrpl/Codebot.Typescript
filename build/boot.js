@@ -1,9 +1,35 @@
 function get(query) {
-    return document.querySelector(query);
+    if (typeof query == "string")
+        return document.querySelector(query);
+    if (query instanceof HTMLElement)
+        return query;
+    return query[0];
 }
 function getAll(query) {
-    return [].slice.call(document.querySelectorAll(query));
+    if (typeof query == "string") {
+        var nodes = document.querySelectorAll(query);
+        return Array.prototype.slice.call(nodes);
+    }
+    if (query instanceof HTMLElement)
+        return [query];
+    return query;
 }
+HTMLElement.prototype.get = function (query) {
+    if (typeof query == "string")
+        return this.querySelector(query);
+    if (query instanceof HTMLElement)
+        return query;
+    return query[0];
+};
+HTMLElement.prototype.getAll = function (query) {
+    if (typeof query == "string") {
+        var nodes = this.querySelectorAll(query);
+        return Array.prototype.slice.call(nodes);
+    }
+    if (query instanceof HTMLElement)
+        return [query];
+    return query;
+};
 if (!String.prototype.includes) {
     String.prototype.includes = function (search, start) {
         if (typeof start !== 'number') {
@@ -70,14 +96,22 @@ var Boot = (function () {
     /** @internal */
     Boot.prototype.start = function () {
         if (this.included && this.loaded) {
-            if (typeof window["main"] === "function")
+            if (typeof window["main"] === "function") {
                 console.log("started");
-            window["main"]();
+                window["main"]();
+            }
         }
     };
     /** @internal */
     Boot.prototype.processIncludes = function () {
         var me = this;
+        function InvalidTarget(element) {
+            var target = element.getAttribute("target-platform");
+            if (target == undefined || target.length < 1)
+                return false;
+            var desktop = typeof window.orientation == "undefined";
+            return target == "mobile" ? desktop : !desktop;
+        }
         function slice(items) {
             return Array.prototype.slice.call(items);
         }
@@ -97,7 +131,7 @@ var Boot = (function () {
             src = item.getAttribute("src");
             if (src.endsWith(".css")) {
                 item.parentNode.removeChild(item);
-                if (me.sources.indexOf(src) > -1) {
+                if (me.sources.indexOf(src) > -1 || InvalidTarget(item)) {
                     load();
                     return "continue";
                 }
@@ -111,7 +145,7 @@ var Boot = (function () {
             }
             else if (src.endsWith(".js")) {
                 item.parentNode.removeChild(item);
-                if (me.sources.indexOf(src) > -1) {
+                if (me.sources.indexOf(src) > -1 || InvalidTarget(item)) {
                     load();
                     return "continue";
                 }
