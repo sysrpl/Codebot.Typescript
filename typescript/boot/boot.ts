@@ -79,7 +79,7 @@ if (!String.prototype.endsWith) {
     };
 }
 
-type BootModule = "ace" | "greensock" | "jquery" | "rivets" | "three";
+type BootModule = "ace" | "greensock" | "jquery" | "promise" | "rivets" | "three";
 
 class Boot {
     /** @internal */
@@ -208,6 +208,10 @@ class Boot {
             "jquery": {
                 "url": "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js",
                 "identifier": "jQuery"
+            },
+            "promise": {
+                "url": "https://www.promisejs.org/polyfills/promise-7.0.4.min.js",
+                "identifier": "Promise"
             },
             "rivets": {
                 "url": "https://cdnjs.cloudflare.com/ajax/libs/rivets/0.9.4/rivets.bundled.min.js",

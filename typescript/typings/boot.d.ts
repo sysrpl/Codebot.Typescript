@@ -10,7 +10,7 @@ interface String {
     startsWith(searchString: string, position?: number): boolean;
     endsWith(searchString: string, position?: number): boolean;
 }
-declare type BootModule = "ace" | "greensock" | "jquery" | "rivets" | "three";
+declare type BootModule = "ace" | "greensock" | "jquery" | "promise" | "rivets" | "three";
 declare class Boot {
     open(url: string, onload: (result: string, state?: any) => void, state?: any): void;
     require(script: string): void;

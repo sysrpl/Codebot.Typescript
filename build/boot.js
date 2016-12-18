@@ -127,7 +127,7 @@ var Boot = (function () {
             me.start();
             return;
         }
-        var _loop_1 = function(item) {
+        var _loop_1 = function (item) {
             src = item.getAttribute("src");
             if (src.endsWith(".css")) {
                 item.parentNode.removeChild(item);
@@ -199,6 +199,10 @@ var Boot = (function () {
             "jquery": {
                 "url": "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js",
                 "identifier": "jQuery"
+            },
+            "promise": {
+                "url": "https://www.promisejs.org/polyfills/promise-7.0.4.min.js",
+                "identifier": "Promise"
             },
             "rivets": {
                 "url": "https://cdnjs.cloudflare.com/ajax/libs/rivets/0.9.4/rivets.bundled.min.js",

@@ -3,14 +3,14 @@
         "target": "es5",
         "module": "system",
         "sourceMap": true,
-        "outFile": "build/manager.js",
+        "outFile": "build/app.js",
         "removeComments": true,
-        "watch": false
+        "watch": false,
+        "lib": ["dom", "es2015.promise", "es5"]
     },
     "include": [
-        "**/app/manager/*.ts",
+        "**/app/*.ts",
         "**/codebot/*.ts",
-        "**/codebot/optional/*.ts",
         "**/*.d.ts"
     ]
 }
