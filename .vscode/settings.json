@@ -1,25 +1,16 @@
 // Workspace settings
 {
-
-    
-
-    
-    // The following will hide the js and map files in the editor
-    //"files.exclude": {
-    //    "**/*.js": true,
-    //    "**/*.map": true
-   //}
-   "files.exclude": {
-       ".gitignore": true,
-       "**/*.csproj": true,
-       "**/*.asax": true,
-       "**/*.ashx": true,
-       "**/*.cs": true,
-       "**/*.iso": true,
-       "**/bin": true,
-       "**/obj": true,
-       "**/resources": true,
-       "**/LICENSE": true,
-       "**/README.md": true
-   }
+    "files.exclude": {
+        "**/bin": true,
+        "**/obj": true,
+        "**/Components": true,
+        "**/Utilities": true,
+        "**/.history": true,
+        "**/*.cs": true,
+        "**/*.asax": true,
+        "**/*.ashx": true,
+        "**/*.csproj": true,
+        "**/created": true,
+        "**/modified": true
+    }  
 }
