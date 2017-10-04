@@ -1,4 +1,5 @@
-*.htm
+.vscode
 *.json
+*.htm
 build
 app.*
