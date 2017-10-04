@@ -90,3 +90,87 @@ Date.prototype.timeAgo = function (): string {
         return interval + "1 minute ago";
     return Math.floor(seconds) + " seconds ago";
 }
+
+/** TimePart relates different slices of time to seconds */
+const enum TimePart {
+    Second = 1,
+    Minute = 60,
+    Hour = Minute * 60,
+    Day = Hour * 24,
+    Week = Day * 7
+}
+
+/** TimeLeft parses iso time left into text and seconds */
+class TimeLeft {
+    /** The time left as text with zero or less descripted as Completed */
+    readonly message: string;
+    /** The number of seconds left */
+    readonly time: number;
+    /** Create TimeLeft give an iso time left string */
+    constructor(s: string) {
+        this.time = 0;
+        if (s.isEmpty() || s[0] != "P") {
+            this.time = TimePart.Week * 2;
+            this.message = "Inactive";
+            return;
+        }
+        if (s == "PT0S") {
+            this.message = "Completed";
+            return;
+        }
+        let phrase = "";
+        let count = 0;
+        let n = "";
+        for (let c of s) {
+            if (c >= '0' && c <= '9')
+                n += c;
+            else if (c == 'D') {
+                let x = n;
+                n = "";
+                if (x.isEmpty())
+                    continue;
+                this.time += parseInt(x) * TimePart.Day;
+                if (count < 2)
+                    phrase = `${phrase} ${x}d`;
+                count++;
+            }
+            else if (c == 'H') {
+                let x = n;
+                n = "";
+                if (x.isEmpty())
+                    continue;
+                this.time += parseInt(x) * TimePart.Hour;
+                if (count < 2)
+                    phrase = `${phrase} ${x}h`;
+                count++;
+            }
+            else if (c == 'M') {
+                let x = n;
+                n = "";
+                if (x.isEmpty())
+                    continue;
+                this.time += parseInt(x) * TimePart.Minute;
+                if (count < 2)
+                    phrase = `${phrase} ${x}m`;
+                count++;
+            }
+            else if (c == 'S') {
+                let x = n;
+                n = "";
+                if (x.isEmpty())
+                    continue;
+                this.time += parseInt(x) * TimePart.Second;
+                if (count < 2)
+                    phrase = `${phrase} ${x}s`;
+                count++;
+            }
+            else
+                n = "";
+        }
+        this.message = phrase;
+    }
+
+    toString(): string {
+        return this.message;
+    }
+}

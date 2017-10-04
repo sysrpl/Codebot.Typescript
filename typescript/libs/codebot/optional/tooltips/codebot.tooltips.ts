@@ -1,7 +1,8 @@
-/** The initTooltips function adds tooltip support */
-function initTooltips(): boolean {
+function initTooltips() {
+    if (isMobile())
+        return;
     if (get("#tipbox"))
-        return false;
+        return;
     let tipbox = `
 <div id="tipbox"><span></span>
     <img id="tip-below" src="/images/tip-below.png">
@@ -53,5 +54,4 @@ function initTooltips(): boolean {
     document.body.addEventListener("DOMNodeRemoved", tooltipOut);
     document.body.appendChild(tipbox);
     document.body.addEventListener("scroll", tooltipOut);
-    return true;
 }

@@ -60,7 +60,7 @@ if (!String.prototype.endsWith) {
         return lastIndex !== -1 && lastIndex === position;
     };
 }
-var Boot = (function () {
+var Boot = /** @class */ (function () {
     /** @internal */
     function Boot() {
         var _this = this;
@@ -183,7 +183,6 @@ var Boot = (function () {
         function load() {
             me.moduleCount--;
             if (me.moduleCount == 0) {
-                /*me.loaded = true; me.start();*/
                 me.processsRequires();
             }
         }
@@ -199,10 +198,6 @@ var Boot = (function () {
             "jquery": {
                 "url": "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js",
                 "identifier": "jQuery"
-            },
-            "promise": {
-                "url": "https://www.promisejs.org/polyfills/promise-7.0.4.min.js",
-                "identifier": "Promise"
             },
             "rivets": {
                 "url": "https://cdnjs.cloudflare.com/ajax/libs/rivets/0.9.4/rivets.bundled.min.js",
@@ -272,7 +267,7 @@ var Boot = (function () {
             if (meta.getAttribute("name") == "boot")
                 return meta.getAttribute("content");
         }
-        return "/build/app.js";
+        return "build/app.js";
     };
     Boot.prototype.open = function (url, onload, state) {
         var request = new XMLHttpRequest();

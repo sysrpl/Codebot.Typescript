@@ -82,11 +82,6 @@ Date.prototype.addDays = function (days) {
     return new Date(this.getTime() + days * 24 * 60 * 60000);
 }
 
-interface Error {
-    status: number,
-    message: string
-}
-
 interface Rect {
     x: number;
     y: number;
@@ -192,12 +187,10 @@ function tryParseInt(value: any, defaultValue?: number): [boolean, number] {
     return isNumber(n) ? [true, n] : [false, isNumber(defaultValue) ? defaultValue : 0];
 }
 
-/** Perform an action after a delay. 
- * @param milliseconds The number of miniseconds to wait.
- * @returns A Promise to await.
-*/
-function delay(milliseconds: number = 10): Promise<void> {
-    return new Promise<void>(resolve => setTimeout(resolve, milliseconds));
+
+/** Perform an action after a very short delay. */
+function shortDelay(proc: Proc) {
+    window.setTimeout(proc, 10);
 }
 
 function initTouch() {
