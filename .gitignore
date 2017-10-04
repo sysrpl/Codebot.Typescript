@@ -1,3 +1,4 @@
+*.htm
+*.json
+build
 app.*
-index.*
-*.cs
