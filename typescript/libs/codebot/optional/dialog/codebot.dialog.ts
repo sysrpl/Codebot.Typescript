@@ -1,5 +1,6 @@
 interface Dialog {
     id: string;
+    cancelable?: boolean;
     caption?: string;
     content?: string;
     accept?: string;
@@ -37,6 +38,13 @@ function initDialog(): boolean {
     }
 
     let overlay = get("#overlay");
+    overlay.addEventListener("click", (ev) => {
+        if (ev.target != overlay)
+            return;
+        let d = currentDialog();
+        if (d && d.cancelable)
+            hideDialog();
+    });
     let dialogs = getAll("#overlay .dialog");
     let wasFullscreen: boolean;
 
@@ -79,7 +87,6 @@ function initDialog(): boolean {
                     dialog.get("button.cancel").click();
             }
         });
-
     }
     return true;
 }
@@ -87,6 +94,7 @@ function initDialog(): boolean {
 function showDialog(dialog: string | Dialog) {
     if (!initDialog())
         return;
+    hideDialog();
     let state: Dialog;
     let node: HTMLElement;
     if (isString(dialog)) {
@@ -100,7 +108,8 @@ function showDialog(dialog: string | Dialog) {
             accept: node.get("button.accept").innerText,
             cancel: node.get("button.cancel").innerText
         };
-    } else {
+    }
+    else {
         node = get(dialog.id);
         if (node == undefined)
             return;
@@ -196,22 +205,22 @@ function dialogInputTest() {
 
 function hideDialog() {
     let state = window["_currentdialog"] as Dialog;
+    if (isUndefined(state))
+        return;
     window["_currentdialog"] = undefined;
-    if (state && state.ondestroy)
+    if (state.ondestroy)
         state.ondestroy();
-    let overlay = get("#overlay.show");
-    if (overlay) {
-        overlay.removeClass("show");
-        let c = get("#overlay .dialog.current");
-        if (c) {
-            c.removeClass("current");
-            setTimeout(() => {
-                c.get(".caption").innerHTML = c["_caption"];
-                c.get(".content").innerHTML = c["_content"];
-                c.get("button.accept").innerText = c["_accept"];
-                c.get("button.cancel").innerText = c["_cancel"];
-            }, 300);
-        }
+    let overlay = get("#overlay");
+    overlay.removeClass("show");
+    let c = get("#overlay .dialog.current");
+    if (c) {
+        c.removeClass("current");
+        setTimeout(() => {
+            c.get(".caption").innerHTML = c["_caption"];
+            c.get(".content").innerHTML = c["_content"];
+            c.get("button.accept").innerText = c["_accept"];
+            c.get("button.cancel").innerText = c["_cancel"];
+        }, 300);
     }
 }
 

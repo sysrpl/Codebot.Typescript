@@ -220,3 +220,13 @@ function baseUrl(): string {
         port = `:${port}`;
     return `${proto}//${document.domain}${port}`;
 }
+
+/** Returns the prefix for non standard browser events or styles such as moz, webkit, and ms. */
+function webPrefix(): string {
+    let styles: any = window.getComputedStyle(document.documentElement, "");
+    return (Array.prototype.slice
+        .call(styles)
+        .join('') 
+        .match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o'])
+      )[1];
+}
