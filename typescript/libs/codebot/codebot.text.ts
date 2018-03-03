@@ -1,4 +1,6 @@
 interface String {
+    /** Replace all occurances of search with replacement */
+    replaceAll(search: string, replacement: string): string;
     /** Append the String object to the document body. */
     writeLine(): void;
     /** Returns a hash of the string. */
@@ -15,6 +17,10 @@ interface String {
     format(...args: any[]): string;
     /** Convert a String object into a DOM element. */
     toElement(): HTMLElement;
+}
+
+String.prototype.replaceAll = function(search: string, replacement: string): string {
+    return this.split(search).join(replacement);
 }
 
 String.prototype.writeLine = function (): void {
