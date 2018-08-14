@@ -33,17 +33,6 @@ if [ "$arg" = "app" ] || [ "$arg" = "all" ]; then
     found=1
 fi
 
-if [ "$arg" = "editor" ] || [ "$arg" = "all" ]; then
-    tsc --p editorconfig.json
-    if [ $? -eq 0 ]; then
-        echo "editor.ts compiled OK"
-    else
-        echo "editor.ts failed to compile"
-        exit 1
-    fi
-    found=1
-fi
-
 if [ $found -eq 0 ]; then
     echo "make target \"$arg\" not found"
     exit 1
