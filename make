@@ -33,7 +33,7 @@ if [ "$arg" = "app" ] || [ "$arg" = "all" ]; then
     found=1
 fi
 
-if [ $found -eq 0 ]; then
+if [ $found -eq 0 ];  then
     echo "make target \"$arg\" not found"
     exit 1
 fi
