@@ -4,12 +4,12 @@
         "module": "system",
         "sourceMap": true,
         "declaration": true,
-        "declarationDir": "typescript/typings",
+        "declarationDir": "source/typings",
         "outDir": "build",
         "stripInternal": true,
         "watch": false
     },
-    "files": [
-        "typescript/boot/boot.ts"
+    "include": [
+        "source/boot/boot.ts"
     ]
 }

@@ -9,11 +9,23 @@ function initTooltips() {
     <img id="tip-above" src="/images/tip-above.png">
 </div>`.toElement();
 
+    function milliTime() {
+        return new Date().getTime();
+    }
+
+    let startTime = milliTime();
+    let stopTime =  startTime;
+    let showing = false;
     let timer: number;
 
     function tooltipOver() {
+        if (showing)
+            return;
+        startTime = milliTime();
+        showing = true;
         let me = this as HTMLElement;
         timer = setTimeout(function () {
+            startTime = milliTime();
             tipbox.firstElementChild.innerHTML = me.getAttribute("data-tooltip");
             tipbox.addClass("visible");
             if (me.hasClass("fixed"))
@@ -39,6 +51,7 @@ function initTooltips() {
     function tooltipOut() {
         window.clearTimeout(timer);
         tipbox.removeClass("visible");
+        showing = false;
     }
 
     function bodyChange() {
@@ -50,8 +63,18 @@ function initTooltips() {
         }
     }
 
+    function bodyRemoved() {
+        stopTime = milliTime();
+        if (stopTime - startTime > 100)
+        {
+            window.clearTimeout(timer);
+            tipbox.removeClass("visible");
+            showing = false;
+        }
+    }
+
     document.body.addEventListener("DOMNodeInserted", bodyChange);
-    document.body.addEventListener("DOMNodeRemoved", tooltipOut);
+    document.body.addEventListener("DOMNodeRemoved", bodyRemoved);
     document.body.appendChild(tipbox);
-    document.body.addEventListener("scroll", tooltipOut);
+    document.body.addEventListener("scroll", bodyRemoved);
 }
