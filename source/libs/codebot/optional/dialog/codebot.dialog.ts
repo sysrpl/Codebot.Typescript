@@ -1,3 +1,5 @@
+/// <reference path="../../codebot.ts" />
+
 interface Dialog {
     id: string;
     cancelable?: boolean;

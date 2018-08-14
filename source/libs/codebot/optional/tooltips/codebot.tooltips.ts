@@ -1,3 +1,5 @@
+/// <reference path="../../codebot.ts" />
+
 function initTooltips() {
     if (isMobile())
         return;
