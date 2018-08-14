@@ -279,7 +279,7 @@ class Boot {
             if (meta.getAttribute("name") == "boot")
                 return meta.getAttribute("content");
         }
-        return "build/app.js";
+        return "/typescript/build/app.js";
     }
 
     /** @internal */

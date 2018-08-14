@@ -267,7 +267,7 @@ var Boot = /** @class */ (function () {
             if (meta.getAttribute("name") == "boot")
                 return meta.getAttribute("content");
         }
-        return "build/app.js";
+        return "/typescript/build/app.js";
     };
     Boot.prototype.open = function (url, onload, state) {
         var request = new XMLHttpRequest();
