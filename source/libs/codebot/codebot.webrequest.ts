@@ -116,7 +116,7 @@ function sendWebRequest(url: string, callback?: WebRequestCallback) {
  * @param data A string or object posted to the enpoint.
  * @param callback Optional notification invoked when the request loads.
  */
-function postWebRequest(url: string, data:FormData | String | Object, callback?: WebRequestCallback) {
+function postWebRequest(url: string, data: FormData | String | Object, callback?: WebRequestCallback) {
     let r = new WebRequest();
     r.post(url, data, callback);
 }
