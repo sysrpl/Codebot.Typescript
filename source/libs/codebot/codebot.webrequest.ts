@@ -24,7 +24,6 @@ class WebRequest {
     private localCache: LocalCache;
     private httpRequest: XMLHttpRequest;
     private cache: boolean;
-    private posting: boolean;
     private callback: WebRequestCallback;
 
     private sendComplete(response: string) {
