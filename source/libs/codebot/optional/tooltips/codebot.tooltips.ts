@@ -34,19 +34,27 @@ function initTooltips() {
                 tipbox.addClass("fixed");
             else                
                 tipbox.removeClass("fixed");
-            let bounds = me.bounds;
-            let x = bounds.x + (bounds.width - tipbox.offsetWidth) / 2;
-            let y = bounds.y - tipbox.offsetHeight - 8;
-            if (y < document.body.scrollTop) {
-                y = bounds.y + bounds.height + 8;
-                tipbox.addClass("below").removeClass("above");
+            let reposition = () => {
+                let bounds = me.bounds;
+                let x = bounds.x + (bounds.width - tipbox.offsetWidth) / 2;
+                let y = bounds.y - tipbox.offsetHeight - 8;
+                if (x < 20) {
+                    tipbox.addClass("left");
+                    x = bounds.x + bounds.width / 2;
+                }
+                else {
+                    tipbox.removeClass("left");
+                }
+                if (y < document.body.scrollTop) {
+                    y = bounds.y + bounds.height + 8;
+                    tipbox.addClass("below").removeClass("above");
+                }
+                else
+                    tipbox.addClass("above").removeClass("below");
+                setStyle(tipbox, { left: x,top: y });
             }
-            else
-                tipbox.addClass("above").removeClass("below");
-            setStyle(tipbox, {
-                left: x,
-                top: y
-            });
+            reposition();
+            shortDelay(reposition);
         }, 1000);
     }
 

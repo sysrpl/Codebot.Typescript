@@ -7,7 +7,7 @@
     border: 1px solid #b7b76c;
     padding: 6px;
     color: #75752c;
-    font-size: 15px;
+    font-size: 13px;
     position: absolute;
     z-index: 99;
     display: inline-block;
@@ -16,7 +16,7 @@
     transition: opacity 0.3s;
     left: 0;
     top: 0;
-    max-width: 250px;
+    max-width: 300px;
     text-align: center;
 }
 
@@ -33,6 +33,14 @@
     position: absolute;
     left: 50%;
     margin-left: -12px;
+} 
+
+#tipbox.left {
+    margin-left: -22px;
+}
+
+#tipbox.left #tip-above, #tipbox.left #tip-below {
+    left: 20px;
 } 
 
 #tipbox #tip-above {

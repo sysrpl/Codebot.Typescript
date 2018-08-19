@@ -2,26 +2,21 @@
 
 /** User represents the person viewing the web page. */
 class User {
-    private title = "";
-    private timer = 0;
-    private methods = ["/?method=login", "/?method=logout"];
+    private _title = "";
+    private _timer = 0;
+    private _name = "anonymous";
+    private _users = [this._name];
 
-    /** Get or set the url to execute for logging into the web page. */
-    get loginMethod() : string {
-        return this.methods[0];
-    }
-
-    set loginMethod(value : string) {
-        this.methods[0] = value;
-    }
-
-    /** Get or set the url to execute for logging out of the web page. */
-    get logoutMethod() : string {
-        return this.methods[1];
-    }
-
-    set logoutMethod(value : string) {
-        this.methods[1] = value;
+    /** Connect to the server and request a name of available users.
+     * @param connected A callback notifying you that the list has been received.
+     */
+    connect(connected: Proc) {
+        sendWebRequest("/?method=users", (request) => {
+            this._users = JSON.parse(request.response);
+            if (this.isAnynomous)
+                this._name = this._users[0];
+            connected();
+        });
     }
 
     /** Log into a domain given a username and password.
@@ -35,7 +30,7 @@ class User {
             password: password ? password : (get("#password") as HTMLInputElement).value,
             redirect: false
         }
-        postWebRequest(this.loginMethod, data, (request) => {
+        postWebRequest("/?method=login", data, (request) => {
             let success = request.response == "OK"; 
             if (complete)
                 complete(success);
@@ -47,14 +42,14 @@ class User {
                     box.reapplyClass("shake");
                 let title = get("#loginTitle");
                 if (title) {
-                    if (this.title == "")
-                    this.title = title.innerHTML;
+                    if (this._title == "")
+                    this._title = title.innerHTML;
                     title.innerHTML = "Invalid username or password";
-                    if (this.timer)
-                        clearTimeout(this.timer);
-                    this.timer = setTimeout(() => {
-                        title.innerHTML = this.title;
-                        this.timer = 0;
+                    if (this._timer)
+                        clearTimeout(this._timer);
+                    this._timer = setTimeout(() => {
+                        title.innerHTML = this._title;
+                        this._timer = 0;
                     }, 3500);
                 }
             }
@@ -66,37 +61,36 @@ class User {
      */
     logout(complete?: Proc) : void {
         if (complete)
-            sendWebRequest(this.logoutMethod, () =>  complete());
+            sendWebRequest("/?method=logout", () =>  complete());
         else
-            sendWebRequest(this.logoutMethod, () =>  navigate("/"));
+            sendWebRequest("/?method=logout", () =>  navigate("/"));
     }
 
     /** Returns true if the user was not logged in. */
     get isAnynomous() : boolean {
-        let s = document.body.getAttribute("data-user");
-        return isDefined(s) ? s.toLowerCase() == "anonymous" : false;
+        return this._name == "anonymous";
     }
 
-    /** Get the name of the current user. If no user exist then "anonymous" is returned.
+    /** Get or set the name of the current user.
      */
     get name() : string {
-        let s = document.body.getAttribute("data-user");
-        if (isDefined(s)) {
-            if (s.length == 0)
-                return "anonymous";
-            if (s.toLowerCase() == "anonymous")
-                return "anonymous";
-            return s;
-        }
-        return "anonymous";
+        return this._name; 
     }
 
-    /** Set the name of the current user. */
     set name(value: string)
     {
-        document.body.setAttribute("data-user", value);
+        this._name = value.trim();
+        if (this._name.length == 0)
+            this._name = "anonymous";
+        else if (this._name.toLowerCase() == "anonymous")
+            this._name = "anonymous";
+    }
+
+    /** Get a list of available users */
+    get users() : string[] {
+        return this._users;
     }
 }
 
-/** The current user. Depends on body "data-user" attribute. */
+/** The current user. */
 let user = new User();
