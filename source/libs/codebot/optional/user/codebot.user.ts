@@ -1,23 +1,51 @@
+/// <reference path="../../codebot.ts" />
+
 /** User represents the person viewing the web page. */
 class User {
+    private originalTitle = "";
+
     /** Log into a domain given a username and password.
      * @param name The name of the user.
      * @param password The password for the user.
-     * @param complete A callback containing true if login was a success. 
+     * @param complete A optional callback containing true if login was a success. 
      */
-    login(name: string, password: string, complete: Action<boolean>) : void {
+    login(name?: string, password?: string, complete?: Action<boolean>) : void {
         let data = {
-            name: name,
-            password: password
+            name: name ? name : (get("#name") as HTMLInputElement).value,
+            password: password ? password : (get("#password") as HTMLInputElement).value,
+            redirect: false
         }
-        postWebRequest("/?method=login", data, (request) =>  complete(request.response == "OK"));
+        postWebRequest("/?method=login", data, (request) => {
+            let success = request.response == "OK"; 
+            if (complete)
+                complete(success);
+            else if (success)
+                location.href = "/";
+            else {
+                let box = get("#loginWindow");
+                if (box) {
+                    box.removeClass("shake");
+                    setTimeout(() => box.addClass("shake"), 10);
+                }
+                let title = get("#loginTitle");
+                if (title) {
+                    if (this.originalTitle == "")
+                    this.originalTitle = title.innerHTML;
+                    title.innerHTML = "Invalid username or password";
+                    setTimeout(() => title.innerHTML = this.originalTitle, 3500);
+                }
+            }
+        });
     }
 
     /** Log out of a domain.
-     * @param complete A callback notifying you when log out has completed. 
+     * @param complete An optional callback notifying you when log out has completed. 
      */
-    logout(complete: Proc) : void {
-        sendWebRequest("/?method=logout", () =>  complete());
+    logout(complete?: Proc) : void {
+        if (complete)
+            sendWebRequest("/?method=logout", () =>  complete());
+        else
+            location.href = "/";
     }
 
     /** Returns true if the user was not logged in. */
