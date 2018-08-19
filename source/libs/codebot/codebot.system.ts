@@ -187,6 +187,12 @@ function tryParseInt(value: any, defaultValue?: number): [boolean, number] {
     return isNumber(n) ? [true, n] : [false, isNumber(defaultValue) ? defaultValue : 0];
 }
 
+/** Navigate the page to a new location.
+ * @param url The absolute or relative location.
+ */
+function navigate(url: string) {
+    location.href = url;
+}
 
 /** Perform an action after a very short delay. */
 function shortDelay(proc: Proc) {

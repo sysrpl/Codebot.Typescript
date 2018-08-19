@@ -25,6 +25,10 @@ interface HTMLElement {
 	 * @param value One or more values to remove.
 	 */
 	removeClass(...value: string[]): HTMLElement;
+	/** Remove then add a class again after a short delay to the HTMLElement. 
+	 * @param value One or more values to reapply.
+	 */
+	reapplyClass(...value: string[]): HTMLElement;
 	/** Toggle values in the class attribute of the HTMLElement. 
 	 * @param value One or more values to remove.
 	 */
@@ -76,8 +80,15 @@ HTMLElement.prototype.removeClass = function (...value: string[]): HTMLElement {
 	return this;
 }
 
+HTMLElement.prototype.reapplyClass = function (...value: string[]): HTMLElement {
+	this.classList.remove(...value);
+	let me = this;
+	shortDelay(() => me.classList.add(...value));
+	return this;
+}
+
 HTMLElement.prototype.toggleClass = function (...value: string[]): HTMLElement {
-	for (let item in value)
+	for (let item of value)
 		this.classList.toggle(item);
 	return this;
 }

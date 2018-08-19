@@ -2,7 +2,27 @@
 
 /** User represents the person viewing the web page. */
 class User {
-    private originalTitle = "";
+    private title = "";
+    private timer = 0;
+    private methods = ["/?method=login", "/?method=logout"];
+
+    /** Get or set the url to execute for logging into the web page. */
+    get loginMethod() : string {
+        return this.methods[0];
+    }
+
+    set loginMethod(value : string) {
+        this.methods[0] = value;
+    }
+
+    /** Get or set the url to execute for logging out of the web page. */
+    get logoutMethod() : string {
+        return this.methods[1];
+    }
+
+    set logoutMethod(value : string) {
+        this.methods[1] = value;
+    }
 
     /** Log into a domain given a username and password.
      * @param name The name of the user.
@@ -15,24 +35,27 @@ class User {
             password: password ? password : (get("#password") as HTMLInputElement).value,
             redirect: false
         }
-        postWebRequest("/?method=login", data, (request) => {
+        postWebRequest(this.loginMethod, data, (request) => {
             let success = request.response == "OK"; 
             if (complete)
                 complete(success);
             else if (success)
-                location.href = "/";
+                navigate("/");
             else {
                 let box = get("#loginWindow");
-                if (box) {
-                    box.removeClass("shake");
-                    setTimeout(() => box.addClass("shake"), 10);
-                }
+                if (box) 
+                    box.reapplyClass("shake");
                 let title = get("#loginTitle");
                 if (title) {
-                    if (this.originalTitle == "")
-                    this.originalTitle = title.innerHTML;
+                    if (this.title == "")
+                    this.title = title.innerHTML;
                     title.innerHTML = "Invalid username or password";
-                    setTimeout(() => title.innerHTML = this.originalTitle, 3500);
+                    if (this.timer)
+                        clearTimeout(this.timer);
+                    this.timer = setTimeout(() => {
+                        title.innerHTML = this.title;
+                        this.timer = 0;
+                    }, 3500);
                 }
             }
         });
@@ -43,9 +66,9 @@ class User {
      */
     logout(complete?: Proc) : void {
         if (complete)
-            sendWebRequest("/?method=logout", () =>  complete());
+            sendWebRequest(this.logoutMethod, () =>  complete());
         else
-            location.href = "/";
+            sendWebRequest(this.logoutMethod, () =>  navigate("/"));
     }
 
     /** Returns true if the user was not logged in. */
