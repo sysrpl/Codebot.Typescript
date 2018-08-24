@@ -1,19 +1,32 @@
 /// <reference path="../../codebot.ts" />
 
  interface Dialog {
+    /** The id of the dialog element. */
     id: string;
+    /** Can be dismissed by clicking outide the dialog. */
     cancelable?: boolean;
+    /** Text at the top of the dialog. */
     caption?: string;
+    /** Content inside the dialog. */
     content?: string;
+    /** Text inside the accept button. */
     accept?: string;
+    /** Callback when dialog was accepted. */
     onaccept?: Proc;
+    /** Text inside the cancel button. */
     cancel?: string;
+    /** Callback when dialog was cancelled. */
     oncancel?: Proc;
+    /** Callback when dialog is created before it is shown. */
     oncreate?: Proc;
+    /** Callback when dialog is dismissed after it is hidden. */
     ondestroy?: Proc;
 }
 
 function initDialog(): boolean {
+    let init: any = initDialog;
+    if (init.__init)
+        return true;
 
     function acceptClick() {
         let me = <HTMLElement>this;
@@ -56,8 +69,8 @@ function initDialog(): boolean {
 
     if (!dialogs)
         return false;
-    if (overlay["initialized"] == undefined) {
-        overlay["initialized"] = true;
+    if (isUndefined(init.__init)) {
+        init.__init = true;
         for (let d of dialogs) {
             d["_caption"] = d.get(".caption").innerHTML;
             d["_content"] = d.get(".content").innerHTML;
