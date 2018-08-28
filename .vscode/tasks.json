@@ -6,7 +6,7 @@
         {
             "label": "make all",
             "type": "shell",
-            "command": "./make",
+            "command": "./make.sh",
             "group": "build",
             "presentation": {
                 "showReuseMessage": false,
@@ -18,7 +18,7 @@
         {
             "label": "make boot",
             "type": "shell",
-            "command": "./make boot",
+            "command": "./make.sh boot",
             "group": "build",
             "presentation": {
                 "showReuseMessage": false,
@@ -30,7 +30,7 @@
         {
             "label": "make app",
             "type": "shell",
-            "command": "./make app",
+            "command": "./make.sh app",
             "group": "build",
             "presentation": {
                 "showReuseMessage": false,
