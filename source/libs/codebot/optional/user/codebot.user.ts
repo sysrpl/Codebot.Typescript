@@ -26,7 +26,7 @@ class User {
      */
     login(name?: string, password?: string, complete?: Action<boolean>) : void {
         let data = {
-            name: name ? name : (get("#name") as HTMLInputElement).value,
+            name: name ? name : ((get("#name") || get("#username") || get("#login")) as HTMLInputElement).value,
             password: password ? password : (get("#password") as HTMLInputElement).value,
             redirect: false
         }
