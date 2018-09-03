@@ -11,7 +11,7 @@ class Slider {
 
     onchange: Action<Slider>;
 
-    update() {
+    private update() {
         if (this._associate)
             this._associate.innerText = this._position.toString();
         let width = this._slider.getBoundingClientRect().width - 26;
