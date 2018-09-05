@@ -26,22 +26,35 @@ class WebRequest {
     private cache: boolean;
     private callback: WebRequestCallback;
 
-    private sendComplete(response: string) {
-        this.response = response;
-        if (this.cache) {
-            this.localCache.store(this.url, this.response);
+    private sendComplete(data?: string) {
+        this.responseText = undefined;
+        this.responseBytes = undefined;
+        if (this.requestType == "arraybuffer" || this.requestType == "blob")
+            this.responseBytes = new Uint8Array(this.httpRequest.response);
+        else if (this.requestType == "document")
+            this.responseXML = this.httpRequest.responseXML;
+        else
+        {
+            if (data)
+                this.responseText = data;
+            else
+                this.responseText = this.httpRequest.responseText;
+            if (this.cache) 
+                this.localCache.store(this.url, this.responseText);
         }
         if (this.callback)
             this.callback(this);
     }
 
     private httpRequestLoad() {
-        this.sendComplete(this.httpRequest.responseText);
+        this.sendComplete();
     }
 
-    constructor() {
+    constructor(requestType: XMLHttpRequestResponseType = "text") {
+        this.requestType = requestType;
         this.localCache = new LocalCache();
         this.httpRequest = new XMLHttpRequest();
+        this.httpRequest.responseType = requestType;
         this.httpRequest.onload = () => this.httpRequestLoad();
         this.callback = undefined;
     }
@@ -49,8 +62,23 @@ class WebRequest {
     /** The endpoint of the last send or post operation. */
     url: string;
 
-    /** The information returned after send completes successfully. */
-    response: string;
+    /** The format of data expected as a result */
+    requestType: XMLHttpRequestResponseType;
+
+    /** After send completes successfully the response in a byte array. */
+    responseBytes: Uint8Array;
+
+    /** After send completes successfully the response in a string. */
+    responseText: string;
+
+    /** After send completes successfully the response in an XML document. */
+    responseXML: Document;
+
+    /** After send completes successfully the response in a javascript object. */
+
+    get responseJSON(): any {
+        return JSON.parse(this.responseText);
+    }
 
     /** Perform an asynchronous http get request.
      * @param url The endpoint for the requested resource.
@@ -111,6 +139,16 @@ function sendWebRequest(url: string, callback?: WebRequestCallback) {
     r.send(url, callback);
 }
 
+/** Perform a one off asynchronous http get request.
+ * @param url The endpoint for the requested resource.
+ * @param requestType The type of data requested.
+ * @param callback Optional notification invoked when the request loads.
+ */
+function sendWebRequestType(url: string, requestType: XMLHttpRequestResponseType, callback: WebRequestCallback) {
+    let r = new WebRequest(requestType);
+    r.send(url, callback);
+}
+
 /** Perform a one off asynchronous http post request.
  * @param url The endpoint for the requested resource.
  * @param data A string or object posted to the enpoint.
@@ -118,6 +156,17 @@ function sendWebRequest(url: string, callback?: WebRequestCallback) {
  */
 function postWebRequest(url: string, data: FormData | String | Object, callback?: WebRequestCallback) {
     let r = new WebRequest();
+    r.post(url, data, callback);
+}
+
+/** Perform a one off asynchronous http post request.
+ * @param url The endpoint for the requested resource.
+ * @param data A string or object posted to the enpoint.
+ * @param requestType The type of data requested.
+ * @param callback Optional notification invoked when the request loads.
+ */
+function postWebRequestType(url: string, data: FormData | String | Object, requestType: XMLHttpRequestResponseType, callback: WebRequestCallback) {
+    let r = new WebRequest(requestType);
     r.post(url, data, callback);
 }
 
