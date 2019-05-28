@@ -258,7 +258,7 @@ textarea:focus, input:focus, button:focus {
     height: 24px;
     border-radius: 4px;
     text-indent: 8px;
-    background: black;
+    background: white;
     line-height: 25px;
     font-size: 17px;
 }
