@@ -169,6 +169,13 @@ function isNumber(obj: any): obj is number {
     return result;
 }
 
+/** Type guard for Object.
+  * @param obj Object to check.
+ */
+function isObject(obj: any): obj is object {
+    return typeof obj === "object" || obj instanceof Object;
+}
+
 /** Type guard for classes.
   * @param obj Object to check.
   * @param type Type check (eg. String HTMLElement, Date ect).  
