@@ -164,9 +164,7 @@ function isString(obj: any): obj is string {
  */
 function isNumber(obj: any): obj is number {
     let result = typeof obj === "number" || obj instanceof Number;
-    if (result)
-        result = obj != Number.NaN;
-    return result;
+    return result && (!isNaN(obj));
 }
 
 /** Type guard for Object.
