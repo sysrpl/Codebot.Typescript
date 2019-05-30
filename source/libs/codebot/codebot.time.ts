@@ -42,6 +42,7 @@ Date.prototype.format = function (formatString: string): string {
         h = 24;
     if (h > 12)
         h -= 12;
+    hhh = hhh < 10 ? ('0' + hhh) : hhh;
     hh = h < 10 ? ('0' + h) : h;
     AMPM = (ampm = hhh < 12 ? "am" : "pm").toUpperCase();
     mm = (m = dateObject.getMinutes()) < 10 ? ("0" + m) : m;

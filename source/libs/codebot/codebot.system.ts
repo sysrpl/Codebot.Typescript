@@ -42,6 +42,8 @@ interface Array<T> {
     shuffle(): void;
     /** The first item in the array. */
     readonly first: T;
+    /** The last item in the array. */
+    readonly last: T;
 }
 
 Array.prototype.contains = function (value): boolean {
@@ -61,7 +63,11 @@ Array.prototype.shuffle = function () {
 }
 
 Array.prototype.__defineGetter__("first", function () {
-    return this[0];
+    return (this.length) ? this[0] : null;
+});
+
+Array.prototype.__defineGetter__("last", function () {
+    return (this.length) ? this[this.length - 1] : null;
 });
 
 interface Date {

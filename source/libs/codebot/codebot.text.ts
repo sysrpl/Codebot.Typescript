@@ -1,4 +1,8 @@
 interface String {
+    /** Pads the start of a string to fit a length */
+    padStart(targetLength: number, padString?: string): string;
+    /** Pads the end of a string to fit a length */
+    padEnd(targetLength: number, padString?: string): string;
     /** Replace all occurances of search with replacement */
     replaceAll(search: string, replacement: string): string;
     /** Append the String object to the document body. */

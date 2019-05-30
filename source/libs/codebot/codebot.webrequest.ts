@@ -75,7 +75,6 @@ class WebRequest {
     responseXML: Document;
 
     /** After send completes successfully the response in a javascript object. */
-
     get responseJSON(): any {
         return JSON.parse(this.responseText);
     }
