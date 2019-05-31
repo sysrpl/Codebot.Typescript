@@ -43,7 +43,7 @@ class User {
                 let title = get("#loginTitle");
                 if (title) {
                     if (this._title == "")
-                    this._title = title.innerHTML;
+                        this._title = title.innerHTML;
                     title.innerHTML = "Invalid username or password";
                     if (this._timer)
                         clearTimeout(this._timer);

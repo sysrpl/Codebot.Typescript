@@ -163,8 +163,9 @@ function isString(obj: any): obj is string {
   * @param obj Object to check.
  */
 function isNumber(obj: any): obj is number {
-    let result = typeof obj === "number" || obj instanceof Number;
-    return result && (!isNaN(obj));
+    if (isNaN(obj))
+        return false;
+    return typeof obj === "number" || obj instanceof Number;
 }
 
 /** Type guard for Object.
