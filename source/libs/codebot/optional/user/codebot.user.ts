@@ -12,7 +12,7 @@ class User {
      */
     connect(connected: Proc) {
         sendWebRequest("/?method=users", (request) => {
-            this._users = JSON.parse(request.response);
+            this._users = JSON.parse(request.responseText);
             if (this.isAnynomous)
                 this._name = this._users[0];
             connected();
@@ -24,14 +24,14 @@ class User {
      * @param password The password for the user.
      * @param complete A optional callback containing true if login was a success. 
      */
-    login(name?: string, password?: string, complete?: Action<boolean>) : void {
+    login(name?: string, password?: string, complete?: Action<boolean>): void {
         let data = {
             name: name ? name : ((get("#name") || get("#username") || get("#login")) as HTMLInputElement).value,
             password: password ? password : (get("#password") as HTMLInputElement).value,
             redirect: false
         }
         postWebRequest("/?method=login", data, (request) => {
-            let success = request.response == "OK"; 
+            let success = request.responseText == "OK"; 
             if (complete)
                 complete(success);
             else if (success)
@@ -43,7 +43,7 @@ class User {
                 let title = get("#loginTitle");
                 if (title) {
                     if (this._title == "")
-                    this._title = title.innerHTML;
+                        this._title = title.innerHTML;
                     title.innerHTML = "Invalid username or password";
                     if (this._timer)
                         clearTimeout(this._timer);
@@ -59,7 +59,7 @@ class User {
     /** Log out of a domain.
      * @param complete An optional callback notifying you when log out has completed. 
      */
-    logout(complete?: Proc) : void {
+    logout(complete?: Proc): void {
         if (complete)
             sendWebRequest("/?method=logout", () =>  complete());
         else
@@ -67,13 +67,13 @@ class User {
     }
 
     /** Returns true if the user was not logged in. */
-    get isAnynomous() : boolean {
+    get isAnynomous(): boolean {
         return this._name == "anonymous";
     }
 
     /** Get or set the name of the current user.
      */
-    get name() : string {
+    get name(): string {
         return this._name; 
     }
 
@@ -87,7 +87,7 @@ class User {
     }
 
     /** Get a list of available users */
-    get users() : string[] {
+    get users(): Array<string> {
         return this._users;
     }
 }

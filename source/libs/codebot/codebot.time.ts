@@ -1,10 +1,11 @@
 interface DateConstructor {
     /** Create a new Date object from its string representation.
-     * @param s The string representation of a date. */
+     * @param s The string representation of a date.
+     * @returns The new date object. */
     fromString(s: string): Date;
 }
 
-Date.fromString = function (s: string): Date {
+Date.fromString = function(s: string): Date {
     var i = Date.parse(s);
     return new Date(i);
 }
@@ -42,6 +43,7 @@ Date.prototype.format = function (formatString: string): string {
         h = 24;
     if (h > 12)
         h -= 12;
+    hhh = hhh < 10 ? ('0' + hhh) : hhh;
     hh = h < 10 ? ('0' + h) : h;
     AMPM = (ampm = hhh < 12 ? "am" : "pm").toUpperCase();
     mm = (m = dateObject.getMinutes()) < 10 ? ("0" + m) : m;
@@ -173,4 +175,24 @@ class TimeLeft {
     toString(): string {
         return this.message;
     }
+}
+
+/** Convert fields within an object to dates.
+ * @param obj The object to modify.
+ * @param names The names of fields to convert from a string to date.
+ * @returns Returns obj which is the first argument.
+ */
+function convertDates(obj: any, ...names: Array<string>): any {
+    if (names.length == 0)
+        return obj;
+    for (let prop in obj) {
+        let p = obj[prop];
+        if (isString(p)) {
+            if (names.contains(p))
+                obj[prop] = new Date(p);
+        } 
+        else if (isObject(p))
+            convertDates(p, ...names);
+    }
+    return obj;        
 }

@@ -167,13 +167,16 @@ function showDialog(dialog: string | Dialog) {
         input.focus();
 }
 
-function messageBox(message: string, caption?: string) {
+function messageBox(message: string, caption?: string, ondismiss?: Proc) {
+    if (isUndefined(ondismiss))
+        ondismiss = () => {};
     let dialog: Dialog = {
         id: "#messageBox",
         caption: caption,
         content: `<div class="message">${message}</div>`,
         accept: "",
-        cancel: "OK"
+        cancel: "OK",
+        oncancel: () => { hideDialog(); ondismiss(); },
     }
     showDialog(dialog);
 }

@@ -1,4 +1,10 @@
 interface String {
+    //** Repeat a string count number of times */
+    repeat(count: number): string;
+    /** Pads the start of a string to fit a length */
+    padStart(targetLength: number, padString?: string): string;
+    /** Pads the end of a string to fit a length */
+    padEnd(targetLength: number, padString?: string): string;
     /** Replace all occurances of search with replacement */
     replaceAll(search: string, replacement: string): string;
     /** Append the String object to the document body. */
@@ -17,6 +23,60 @@ interface String {
     format(...args: any[]): string;
     /** Convert a String object into a DOM element. */
     toElement(): HTMLElement;
+}
+
+if (!String.prototype.repeat) {
+    String.prototype.repeat = function(count) {
+        if (this == null)
+            throw new TypeError('can\'t convert ' + this + ' to object');
+        count = +count;
+        if (count != count)
+            count = 0;
+        if (count < 0)
+            throw new RangeError('repeat count must be non-negative');
+        if (count == Infinity)
+            throw new RangeError('repeat count must be less than infinity');
+        count = Math.floor(count);
+        let s = this;
+        if (s.length == 0 || count == 0)
+            return '';
+        if (s.length * count >= 1 << 28)
+            throw new RangeError('repeat count must not overflow maximum string size');
+        var maxCount = s.length * count;
+        count = Math.floor(Math.log(count) / Math.log(2));
+        while (count) {
+            s += s;
+            count--;
+        }
+        s += s.substring(0, maxCount - s.length);
+        return s;
+    }
+}
+
+if (!String.prototype.padStart) {
+    String.prototype.padStart = function padStart(targetLength, padString) {
+        targetLength = targetLength >> 0;
+        padString = String(typeof padString !== 'undefined' ? padString : ' ');
+        if (this.length >= targetLength)
+            return String(this);
+        targetLength = targetLength - this.length;
+        if (targetLength > padString.length)
+            padString += padString.repeat(targetLength / padString.length);
+        return padString.slice(0, targetLength) + String(this);
+    }
+}
+
+if (!String.prototype.padEnd) {
+    String.prototype.padEnd = function padEnd(targetLength, padString) {
+        targetLength = targetLength >> 0;
+        padString = String((typeof padString !== 'undefined' ? padString : ' '));
+        if (this.length > targetLength)
+            return String(this);
+        targetLength = targetLength - this.length;
+        if (targetLength > padString.length)
+            padString += padString.repeat(targetLength/padString.length);
+        return String(this) + padString.slice(0,targetLength);
+    }
 }
 
 String.prototype.replaceAll = function(search: string, replacement: string): string {
