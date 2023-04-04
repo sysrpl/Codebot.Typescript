@@ -93,6 +93,41 @@ interface Rect {
     y: number;
     width: number;
     height: number;
+    readonly left: number;
+    readonly top: number;
+    readonly right: number;
+    readonly bottom: number;
+}
+
+class RectObject implements Rect {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    name: string;
+
+    public constructor(x: number = 0, y: number = 0, width: number = 0, height: number = 0) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+
+    get left(): number {
+        return this.x;
+    }
+
+    get top(): number {
+        return this.y;
+    }
+
+    get right(): number {
+        return this.x + this.width;
+    }
+
+    get bottom(): number {
+        return this.y + this.height;
+    }
 }
 
 interface Point {
@@ -132,7 +167,7 @@ function isDesktop(): boolean {
 
 /** Returns a default value if a value is undefined or null.
  * @param obj The value to test.
- * @param defaultValue The value to return if obj is undefined or null. 
+ * @param defaultValue The value to return if obj is undefined or null.
  */
 function getDefault<T>(obj: Nullable<T>, defaultValue: T): T {
     return isDefined(obj) ? obj : defaultValue;
@@ -177,7 +212,7 @@ function isObject(obj: any): obj is object {
 
 /** Type guard for classes.
   * @param obj Object to check.
-  * @param type Type check (eg. String HTMLElement, Date ect).  
+  * @param type Type check (eg. String HTMLElement, Date ect).
   */
 function isTypeOf<T>(obj: any, type: { new (): T; }): obj is T {
     let t: any = type;
@@ -244,7 +279,7 @@ function webPrefix(): string {
     let styles: any = window.getComputedStyle(document.documentElement, "");
     return (Array.prototype.slice
         .call(styles)
-        .join('') 
+        .join('')
         .match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o'])
       )[1];
 }
