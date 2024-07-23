@@ -89,15 +89,15 @@ class Boot {
     /** @internal */
     private requestCount = 0;
     /** @internal */
-    private sources = [];
+    private sources: string[] = [];
     /** @internal */
     private moduleCount = 0;
     /** @internal */
-    private modules = [];
+    private modules: string[] = [];
     /** @internal */
     private requireCount = 0;
     /** @internal */
-    private requires = [];
+    private requires: string[] = [];
 
     /** @internal */
     private start(): void {
@@ -140,8 +140,10 @@ class Boot {
         }
         for (let item of includes) {
             var src = item.getAttribute("src");
-            if (src.endsWith(".css")) {
-                item.parentNode.removeChild(item);
+            if (src == null) 
+                 break;
+            if (src != null && src.endsWith(".css")) {
+                item.parentNode?.removeChild(item);
                 if (me.sources.indexOf(src) > -1 || InvalidTarget(item)) {
                     load();
                     continue;
@@ -154,8 +156,8 @@ class Boot {
                 document.getElementsByTagName("head")[0].appendChild(link);
                 link.href = src;
             }
-            else if (src.endsWith(".js")) {
-                item.parentNode.removeChild(item);
+            else if (src && src.endsWith(".js")) {
+                item.parentNode?.removeChild(item);
                 if (me.sources.indexOf(src) > -1 || InvalidTarget(item)) {
                     load();
                     continue;
@@ -170,13 +172,14 @@ class Boot {
             else {
                 let parent = item.parentNode;
                 let next = item.nextSibling;
-                parent.removeChild(item);
+                parent?.removeChild(item);
                 me.open(src, (result: string, includeNode: HTMLElement) => {
                     includeNode.innerHTML = result;
                     let nodes = slice(includeNode.children);
                     while (nodes.length) {
                         let node = nodes.shift();
-                        parent.insertBefore(node, next);
+                        if (node)
+                            parent?.insertBefore(node, next);
                     }
                     load();
                 }, item);
@@ -277,7 +280,7 @@ class Boot {
         for (let i = 0; i < metas.length; i++) {
             let meta = metas[i];
             if (meta.getAttribute("name") == "boot")
-                return meta.getAttribute("content");
+                return meta.getAttribute("content") ?? "";
         }
         return "/typescript/build/app.js";
     }
