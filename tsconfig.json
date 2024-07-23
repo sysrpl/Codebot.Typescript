@@ -1,12 +1,11 @@
 {
     "compilerOptions": {
-        "target": "es5",
+        "target": "es6",
         "module": "system",
         "sourceMap": true,
         "outFile": "build/app.js",
         "removeComments": true,
-        "watch": false,
-        "lib": ["dom", "es2015.promise", "es5"]
+        "lib": ["dom", "es6"]
     },
     "include": [
         "**/app/app.ts"

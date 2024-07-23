@@ -24,7 +24,8 @@ class WebRequest {
     private localCache: LocalCache;
     private httpRequest: XMLHttpRequest;
     private cache: boolean;
-    private callback: WebRequestCallback;
+    private succcessCallback: WebRequestCallback;
+    private errorCallback: WebRequestCallback;
 
     private sendComplete(data?: string) {
         this.responseText = undefined;
@@ -42,12 +43,21 @@ class WebRequest {
             if (this.cache) 
                 this.localCache.store(this.url, this.responseText);
         }
-        if (this.callback)
-            this.callback(this);
+        if (this.succcessCallback)
+            this.succcessCallback(this);
     }
 
     private httpRequestLoad() {
-        this.sendComplete();
+        let code = this.httpRequest.status;
+        if (code > 199 && code < 300)
+            this.sendComplete();
+        else if (this.errorCallback)    
+            this.errorCallback(this);
+    }
+
+    private httpRequestError() {
+        if (this.errorCallback)
+            this.errorCallback(this);
     }
 
     constructor(requestType: XMLHttpRequestResponseType = "text") {
@@ -56,7 +66,21 @@ class WebRequest {
         this.httpRequest = new XMLHttpRequest();
         this.httpRequest.responseType = requestType;
         this.httpRequest.onload = () => this.httpRequestLoad();
-        this.callback = undefined;
+        this.httpRequest.onerror = () => this.httpRequestError();
+        this.succcessCallback = null;
+        this.errorCallback = null;
+    }
+
+    public set onsuccess(handler: WebRequestCallback) {
+        this.succcessCallback = handler;
+    }
+
+    public set onerror(handler: WebRequestCallback) {
+        this.errorCallback = handler;
+    }
+
+    public get status(): number {
+        return this.httpRequest.status;
     }
 
     /** The endpoint of the last send or post operation. */
@@ -81,13 +105,14 @@ class WebRequest {
 
     /** Perform an asynchronous http get request.
      * @param url The endpoint for the requested resource.
-     * @param callback Your notification invoked after request completes successfully.
+     * @param onsuccess Your notification invoked after request completes successfully.
      * @param cache When cache is true responses are reused for each distinct url. 
      */
-    send(url: string, callback?: WebRequestCallback, cache?: boolean): void {
+    send(url: string, onsuccess?: WebRequestCallback, onerror?: WebRequestCallback, cache?: boolean): void {
         this.httpRequest.abort();
         this.url = url;
-        this.callback = callback;
+        this.succcessCallback = onsuccess;
+        this.errorCallback = onerror;
         this.cache = cache;
         if (cache && this.localCache.exists(url))
             this.sendComplete(this.localCache.recall(url));
@@ -101,10 +126,12 @@ class WebRequest {
      * @param url The endpoint for the requested resource.
      * @param data Data posted to recipient enpoint.
      */
-    post(url: string, data: FormData | String | Object, callback?: WebRequestCallback, cache?: boolean): void {
+    post(url: string, data: FormData | String | Object, onsuccess?: WebRequestCallback, 
+        onerror?: WebRequestCallback, cache?: boolean): void {
         this.httpRequest.abort();
         this.url = url;
-        this.callback = callback;
+        this.succcessCallback = onsuccess;
+        this.errorCallback = onerror;   
         this.cache = cache;
         if (cache && this.localCache.exists(url))
             this.sendComplete(this.localCache.recall(url));
@@ -131,42 +158,46 @@ type WebRequestCallback = (request: WebRequest) => void;
 
 /** Perform a one off asynchronous http get request.
  * @param url The endpoint for the requested resource.
- * @param callback Optional notification invoked when the request loads.
+ * @param succcess Optional notification invoked when the request loads.
  */
-function sendWebRequest(url: string, callback?: WebRequestCallback) {
+function sendWebRequest(url: string, onsuccess?: WebRequestCallback, onerror?: WebRequestCallback) {
     let r = new WebRequest();
-    r.send(url, callback);
+    r.send(url, onsuccess, onerror);
 }
 
 /** Perform a one off asynchronous http get request.
  * @param url The endpoint for the requested resource.
  * @param requestType The type of data requested.
- * @param callback Optional notification invoked when the request loads.
+ * @param onsuccess Optional notification invoked when the request loads.
  */
-function sendWebRequestType(url: string, requestType: XMLHttpRequestResponseType, callback: WebRequestCallback) {
+function sendWebRequestType(url: string, requestType: XMLHttpRequestResponseType,
+    onsuccess?: WebRequestCallback, onerror?: WebRequestCallback) {
     let r = new WebRequest(requestType);
-    r.send(url, callback);
+    r.send(url, onsuccess, onerror);
 }
 
 /** Perform a one off asynchronous http post request.
  * @param url The endpoint for the requested resource.
  * @param data A string or object posted to the enpoint.
- * @param callback Optional notification invoked when the request loads.
+ * @param onsuccess Optional notification invoked when the request loads.
  */
-function postWebRequest(url: string, data: FormData | String | Object, callback?: WebRequestCallback) {
+function postWebRequest(url: string, data: FormData | String | Object,
+    onsuccess?: WebRequestCallback, onerror?: WebRequestCallback) {
     let r = new WebRequest();
-    r.post(url, data, callback);
+    r.post(url, data, onsuccess, onerror);
 }
 
 /** Perform a one off asynchronous http post request.
  * @param url The endpoint for the requested resource.
  * @param data A string or object posted to the enpoint.
  * @param requestType The type of data requested.
- * @param callback Optional notification invoked when the request loads.
+ * @param onsuccess Optional notification invoked when the request loads.
  */
-function postWebRequestType(url: string, data: FormData | String | Object, requestType: XMLHttpRequestResponseType, callback: WebRequestCallback) {
+function postWebRequestType(url: string, data: FormData | String | Object,
+    requestType: XMLHttpRequestResponseType, onsuccess?: WebRequestCallback,
+    onerror?: WebRequestCallback) {
     let r = new WebRequest(requestType);
-    r.post(url, data, callback);
+    r.post(url, data, onsuccess, onerror);
 }
 
 /** Copies an object's enumerable properties into a FormData object.

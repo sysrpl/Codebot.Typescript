@@ -7,7 +7,7 @@ function get(query) {
 }
 function getAll(query) {
     if (typeof query == "string") {
-        var nodes = document.querySelectorAll(query);
+        let nodes = document.querySelectorAll(query);
         return Array.prototype.slice.call(nodes);
     }
     if (query instanceof HTMLElement)
@@ -23,7 +23,7 @@ HTMLElement.prototype.get = function (query) {
 };
 HTMLElement.prototype.getAll = function (query) {
     if (typeof query == "string") {
-        var nodes = this.querySelectorAll(query);
+        let nodes = this.querySelectorAll(query);
         return Array.prototype.slice.call(nodes);
     }
     if (query instanceof HTMLElement)
@@ -60,56 +60,24 @@ if (!String.prototype.endsWith) {
         return lastIndex !== -1 && lastIndex === position;
     };
 }
-var Boot = /** @class */ (function () {
+class Boot {
     /** @internal */
-    function Boot() {
-        var _this = this;
-        /** @internal */
-        this.included = false;
-        /** @internal */
-        this.loaded = false;
-        /** @internal */
-        this.requestCount = 0;
-        /** @internal */
-        this.sources = [];
-        /** @internal */
-        this.moduleCount = 0;
-        /** @internal */
-        this.modules = [];
-        /** @internal */
-        this.requireCount = 0;
-        /** @internal */
-        this.requires = [];
-        if (window["boot"])
-            return;
-        var me = this;
-        window["boot"] = me;
-        me.processIncludes();
-        window.addEventListener("DOMContentLoaded", function () {
-            var script = document.createElement("script");
-            script.type = "text/javascript";
-            script.onload = function () { return me.processUses(); };
-            document.body.appendChild(script);
-            script.src = _this.app();
-        });
-    }
-    /** @internal */
-    Boot.prototype.start = function () {
+    start() {
         if (this.included && this.loaded) {
             if (typeof window["main"] === "function") {
                 console.log("started");
                 window["main"]();
             }
         }
-    };
+    }
     /** @internal */
-    Boot.prototype.processIncludes = function () {
-        var me = this;
+    processIncludes() {
+        let me = this;
         function InvalidTarget(element) {
-            var target = element.getAttribute("target-platform");
+            let target = element.getAttribute("target-platform");
             if (target == undefined || target.length < 1)
                 return false;
-            var desktop = typeof window.orientation == "undefined";
+            let desktop = typeof window.orientation == "undefined";
             return target == "mobile" ? desktop : !desktop;
         }
         function slice(items) {
@@ -127,19 +95,19 @@ var Boot = /** @class */ (function () {
             me.start();
             return;
         }
-        var _loop_1 = function (item) {
-            src = item.getAttribute("src");
+        for (let item of includes) {
+            var src = item.getAttribute("src");
             if (src.endsWith(".css")) {
                 item.parentNode.removeChild(item);
                 if (me.sources.indexOf(src) > -1 || InvalidTarget(item)) {
                     load();
-                    return "continue";
+                    continue;
                 }
                 me.sources.push(src);
-                var link = document.createElement("link");
+                let link = document.createElement("link");
                 link.rel = "stylesheet";
                 link.type = "text/css";
-                link.onload = function () { load(); };
+                link.onload = () => { load(); };
                 document.getElementsByTagName("head")[0].appendChild(link);
                 link.href = src;
             }
@@ -147,39 +115,34 @@ var Boot = /** @class */ (function () {
                 item.parentNode.removeChild(item);
                 if (me.sources.indexOf(src) > -1 || InvalidTarget(item)) {
                     load();
-                    return "continue";
+                    continue;
                 }
                 me.sources.push(src);
-                var script = document.createElement("script");
+                let script = document.createElement("script");
                 script.type = "text/javascript";
-                script.onload = function () { load(); };
+                script.onload = () => { load(); };
                 document.body.appendChild(script);
                 script.src = src;
             }
             else {
-                var parent_1 = item.parentNode;
-                var next_1 = item.nextSibling;
-                parent_1.removeChild(item);
-                me.open(src, function (result, includeNode) {
+                let parent = item.parentNode;
+                let next = item.nextSibling;
+                parent.removeChild(item);
+                me.open(src, (result, includeNode) => {
                     includeNode.innerHTML = result;
-                    var nodes = slice(includeNode.children);
+                    let nodes = slice(includeNode.children);
                     while (nodes.length) {
-                        var node = nodes.shift();
-                        parent_1.insertBefore(node, next_1);
+                        let node = nodes.shift();
+                        parent.insertBefore(node, next);
                     }
                     load();
                 }, item);
             }
-        };
-        var src;
-        for (var _i = 0, includes_1 = includes; _i < includes_1.length; _i++) {
-            var item = includes_1[_i];
-            _loop_1(item);
         }
-    };
+    }
     /** @internal */
-    Boot.prototype.processUses = function () {
-        var me = this;
+    processUses() {
+        let me = this;
         function load() {
             me.moduleCount--;
             if (me.moduleCount == 0) {
@@ -214,24 +177,23 @@ var Boot = /** @class */ (function () {
             load();
             return;
         }
-        for (var _i = 0, _a = me.modules; _i < _a.length; _i++) {
-            var key = _a[_i];
-            var module = entries[key];
+        for (let key of me.modules) {
+            let module = entries[key];
             if (!module || window[module.url] || me.sources.indexOf(module.url) > -1) {
                 load();
                 continue;
             }
             me.sources.push(module.url);
-            var script = document.createElement("script");
+            let script = document.createElement("script");
             script.type = "text/javascript";
-            script.onload = function () { load(); };
+            script.onload = () => { load(); };
             document.body.appendChild(script);
             script.src = module.url;
         }
-    };
+    }
     /** @internal */
-    Boot.prototype.processsRequires = function () {
-        var me = this;
+    processsRequires() {
+        let me = this;
         function load() {
             me.requireCount--;
             if (me.requireCount == 0) {
@@ -245,51 +207,78 @@ var Boot = /** @class */ (function () {
             load();
             return;
         }
-        for (var _i = 0, _a = me.requires; _i < _a.length; _i++) {
-            var src = _a[_i];
+        for (let src of me.requires) {
             if (!src || window[src] || me.sources.indexOf(src) > -1) {
                 load();
                 continue;
             }
             me.sources.push(src);
-            var script = document.createElement("script");
+            let script = document.createElement("script");
             script.type = "text/javascript";
-            script.onload = function () { load(); };
+            script.onload = () => { load(); };
             document.body.appendChild(script);
             script.src = src;
         }
-    };
+    }
     /** @internal */
-    Boot.prototype.app = function () {
-        var metas = document.getElementsByTagName("meta");
-        for (var i = 0; i < metas.length; i++) {
-            var meta = metas[i];
+    app() {
+        let metas = document.getElementsByTagName("meta");
+        for (let i = 0; i < metas.length; i++) {
+            let meta = metas[i];
             if (meta.getAttribute("name") == "boot")
                 return meta.getAttribute("content");
         }
         return "/typescript/build/app.js";
-    };
-    Boot.prototype.open = function (url, onload, state) {
-        var request = new XMLHttpRequest();
+    }
+    /** @internal */
+    constructor() {
+        /** @internal */
+        this.included = false;
+        /** @internal */
+        this.loaded = false;
+        /** @internal */
+        this.requestCount = 0;
+        /** @internal */
+        this.sources = [];
+        /** @internal */
+        this.moduleCount = 0;
+        /** @internal */
+        this.modules = [];
+        /** @internal */
+        this.requireCount = 0;
+        /** @internal */
+        this.requires = [];
+        if (window["boot"])
+            return;
+        let me = this;
+        window["boot"] = me;
+        me.processIncludes();
+        window.addEventListener("DOMContentLoaded", () => {
+            let script = document.createElement("script");
+            script.type = "text/javascript";
+            script.onload = () => me.processUses();
+            document.body.appendChild(script);
+            script.src = this.app();
+        });
+    }
+    open(url, onload, state) {
+        let request = new XMLHttpRequest();
         request.open("GET", url, true);
-        request.onload = function () {
+        request.onload = () => {
             onload(request.response, state);
         };
         request.send();
-    };
-    Boot.prototype.require = function (script) {
+    }
+    require(script) {
         if (this.requires.indexOf(script) < 0)
             this.requires.push(script);
-    };
-    Boot.prototype.use = function (module) {
-        var items = Array.isArray(module) ? module : [module];
-        for (var _i = 0, items_1 = items; _i < items_1.length; _i++) {
-            var item = items_1[_i];
+    }
+    use(module) {
+        let items = Array.isArray(module) ? module : [module];
+        for (let item of items)
             if (this.modules.indexOf(item) < 0)
                 this.modules.push(item);
-        }
-    };
-    return Boot;
-}());
+    }
+}
 new Boot();
 //# sourceMappingURL=boot.js.map
