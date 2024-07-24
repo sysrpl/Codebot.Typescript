@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "module": "system",
         "sourceMap": true,
         "outFile": "build/app.js",
         "removeComments": true,

@@ -72,6 +72,7 @@ class Boot {
     }
     /** @internal */
     processIncludes() {
+        var _a, _b;
         let me = this;
         function InvalidTarget(element) {
             let target = element.getAttribute("target-platform");
@@ -97,8 +98,10 @@ class Boot {
         }
         for (let item of includes) {
             var src = item.getAttribute("src");
-            if (src.endsWith(".css")) {
-                item.parentNode.removeChild(item);
+            if (src == null)
+                break;
+            if (src != null && src.endsWith(".css")) {
+                (_a = item.parentNode) === null || _a === void 0 ? void 0 : _a.removeChild(item);
                 if (me.sources.indexOf(src) > -1 || InvalidTarget(item)) {
                     load();
                     continue;
@@ -111,8 +114,8 @@ class Boot {
                 document.getElementsByTagName("head")[0].appendChild(link);
                 link.href = src;
             }
-            else if (src.endsWith(".js")) {
-                item.parentNode.removeChild(item);
+            else if (src && src.endsWith(".js")) {
+                (_b = item.parentNode) === null || _b === void 0 ? void 0 : _b.removeChild(item);
                 if (me.sources.indexOf(src) > -1 || InvalidTarget(item)) {
                     load();
                     continue;
@@ -127,13 +130,14 @@ class Boot {
             else {
                 let parent = item.parentNode;
                 let next = item.nextSibling;
-                parent.removeChild(item);
+                parent === null || parent === void 0 ? void 0 : parent.removeChild(item);
                 me.open(src, (result, includeNode) => {
                     includeNode.innerHTML = result;
                     let nodes = slice(includeNode.children);
                     while (nodes.length) {
                         let node = nodes.shift();
-                        parent.insertBefore(node, next);
+                        if (node)
+                            parent === null || parent === void 0 ? void 0 : parent.insertBefore(node, next);
                     }
                     load();
                 }, item);
@@ -222,11 +226,12 @@ class Boot {
     }
     /** @internal */
     app() {
+        var _a;
         let metas = document.getElementsByTagName("meta");
         for (let i = 0; i < metas.length; i++) {
             let meta = metas[i];
             if (meta.getAttribute("name") == "boot")
-                return meta.getAttribute("content");
+                return (_a = meta.getAttribute("content")) !== null && _a !== void 0 ? _a : "";
         }
         return "/typescript/build/app.js";
     }
