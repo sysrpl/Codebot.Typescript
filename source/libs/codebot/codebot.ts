@@ -6,3 +6,4 @@
 /// <reference path="codebot.time.ts" />
 /// <reference path="codebot.diagnostics.ts" />
 /// <reference path="codebot.text.ts" />
+/// <reference path="codebot.events.ts" />

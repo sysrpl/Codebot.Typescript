@@ -1,4 +1,4 @@
-type QuerySelect = string | HTMLElement | Array<HTMLElement>;
+declare type QuerySelect = string | HTMLElement | Array<HTMLElement>;
 declare function get(query: QuerySelect): HTMLElement;
 declare function getAll(query: QuerySelect): Array<HTMLElement>;
 interface HTMLElement {
@@ -10,7 +10,7 @@ interface String {
     startsWith(searchString: string, position?: number): boolean;
     endsWith(searchString: string, position?: number): boolean;
 }
-type BootModule = "ace" | "greensock" | "jquery" | "rivets" | "three";
+declare type BootModule = "ace" | "greensock" | "jquery" | "rivets" | "three";
 declare class Boot {
     open(url: string, onload: (result: string, state?: any) => void, state?: any): void;
     require(script: string): void;

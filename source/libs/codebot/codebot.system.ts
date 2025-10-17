@@ -1,3 +1,11 @@
+interface Document {
+    [key: string]: any;
+}
+
+interface Window {
+    [key: string]: any;
+}
+
 /** Key codes */
 enum Key {
     Backspace = 8,
@@ -138,7 +146,7 @@ interface Point {
 type Proc = () => void;
 type Action<T> = (t: T) => void;
 type Func<T> = () => T;
-type Ctor<T> = { new (): T; };
+type Ctor<T> = { new(): T; };
 type Nullable<T> = T | undefined | void;
 
 /** Returns true if a value is not undefined and not null.
@@ -210,11 +218,47 @@ function isObject(obj: any): obj is object {
     return typeof obj === "object" || obj instanceof Object;
 }
 
+/** Type guard for mouse and touch events.
+  * @param e FingerEvent to check.
+ */
+type FingerEvent = MouseEvent | TouchEvent;
+
+interface FingerPos { clientX: number, clientY: number }
+
+function isTouchEvent(e: FingerEvent): e is TouchEvent {
+    return e instanceof TouchEvent;
+}
+
+function isMouseEvent(e: FingerEvent): e is MouseEvent {
+    return e instanceof MouseEvent;
+}
+
+function getFingerPos(e: FingerEvent): FingerPos {
+    if (isMouseEvent(e))
+        return {
+            clientX: e.clientX,
+            clientY: e.clientY
+        };
+    if (e.touches.length > 0)
+        return {
+            clientX: e.touches[0].clientX,
+            clientY: e.touches[0].clientY
+        };
+    return {
+        clientX: 0,
+        clientY: 0
+    };
+}
+
+function hasTouchSupport() {
+    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+}
+
 /** Type guard for classes.
   * @param obj Object to check.
   * @param type Type check (eg. String HTMLElement, Date ect).
   */
-function isTypeOf<T>(obj: any, type: { new (): T; }): obj is T {
+function isTypeOf<T>(obj: any, type: { new(): T; }): obj is T {
     let t: any = type;
     if (t.name === "String")
         return isString(obj);
@@ -281,5 +325,40 @@ function webPrefix(): string {
         .call(styles)
         .join('')
         .match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['', 'o'])
-      )[1];
+    )[1];
+}
+
+/**
+ * Sets a new cookie or updates an existing one.
+ * @param name The name (key) of the cookie.
+ * @param value The value of the cookie.
+ * @param days Optional number of days until the cookie expires.
+ */
+function setCookie(name: string, value: string, days?: number) {
+    let expires = '';
+    if (days) {
+        const date = new Date();
+        // Set the expiry date based on the number of days
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = `; expires=${date.toUTCString()}`;
+    }
+    document.cookie = `${name}=${encodeURIComponent(value)}${expires}; path=/`;
+}
+
+/**
+ * Reads the value of a specific cookie.
+ * @param name The name (key) of the cookie to retrieve.
+ * @returns The cookie's value, or null if the cookie is not found.
+ */
+function getCookie(name: string): string | null {
+    const cookies = document.cookie.split(';');
+    const cookieName = `${name}=`;
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        if (cookie.startsWith(cookieName)) {
+            const value = cookie.substring(cookieName.length, cookie.length);
+            return decodeURIComponent(value);
+        }
+    }
+    return null;
 }
