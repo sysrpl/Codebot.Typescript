@@ -362,3 +362,24 @@ function getCookie(name: string): string | null {
     }
     return null;
 }
+
+type FetchAction = Action<any>;
+
+function fetchJson(request: string, action: FetchAction) {
+    fetch(request)
+        .then(r => r.json())
+        .then(d => action(d));
+}
+
+function fetchPost(request: string, body: object | string) {
+    let s: string;
+    if (isString(body))
+        s = body
+    else
+        s = (new URLSearchParams(body as any)).toString();
+    fetch(request, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: s
+    });
+}

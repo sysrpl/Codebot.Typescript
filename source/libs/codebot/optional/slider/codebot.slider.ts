@@ -16,14 +16,16 @@ class Slider {
     private _offset: number;
     private _orientation: SliderOrientation;
     private _inverted: boolean;
+    private _timer: number;
 
     onchange: Action<Slider> | null;
+    onsubmit: Action<Slider> | null;
 
     public update() {
         if (this._associate)
             this._associate.innerText = this._position.toString();
         if (this._orientation == SliderOrientation.Horizontal) {
-            let width = this._slider.getBoundingClientRect().width - this._offset;
+            let width = this._slider.getBoundingClientRect().width - this._offset - 2;
             let range = this._max - this._min;
             let percent = (this._position - this.min) / range;
             if (this._inverted)
@@ -31,7 +33,7 @@ class Slider {
             this._knob.style.left = (width * percent).toString() + "px";
         }
         else {
-            let height = this._slider.getBoundingClientRect().height - this._offset;
+            let height = this._slider.getBoundingClientRect().height - this._offset - 2;
             let range = this._max - this._min;
             let percent = (this._position - this.min) / range;
             if (this._inverted)
@@ -40,23 +42,39 @@ class Slider {
         }
     }
 
+    private handleSubmit() {
+        this._timer = 0;
+        if (this.onsubmit)
+            this.onsubmit(this);
+    }
+
     get position(): number {
         return this._position;
     }
 
     set position(value: number) {
-        if (value < this._min)
-            value = this._min;
-        else if (value > this._max)
-            value = this._max;
-        let r = 1 / this._step;
-        value = Math.round(value * r) / r;
-        if (value == this._position)
-            return;
-        this._position = value;
-        this.update();
+        this.move(value);
         if (this.onchange)
             this.onchange(this);
+        if (this._timer)
+            clearTimeout(this._timer);
+        this._timer = 0;
+        if (this.onsubmit)
+            this._timer = setTimeout(this.handleSubmit.bind(this), 250);
+    }
+
+    /** Move to a position directly without firing events
+     * @param p The new position to set.
+     */
+    public move(p: number) {
+        if (p < this._min)
+            p = this._min;
+        else if (p > this._max)
+            p = this._max;
+        let r = 1 / this._step;
+        p = Math.round(p * r) / r;
+        this._position = p;
+        this.update();
     }
 
     get step(): number {
@@ -64,8 +82,8 @@ class Slider {
     }
 
     set step(value: number) {
-        if (value < 0.01)
-            value = 0.01;
+        if (value < 0.0001)
+            value = 0.0001;
         this._step = value;
         this.position = this._position;
     }
@@ -121,10 +139,11 @@ class Slider {
     }
 
     constructor(slider: string, associate?: string) {
-        this._slider = get(slider);
         let knob = document.createElement("div");
         knob.classList.add("knob");
+        this._slider = get(slider);
         this._slider.appendChild(knob);
+        this._slider["slider"] = this;
         this._knob = knob;
         this._associate = associate ? get(associate) : null;
         this._position = 0;
@@ -134,9 +153,11 @@ class Slider {
         this._offset = 26;
         this._orientation = SliderOrientation.Horizontal;
         this._inverted = false;
+        this._timer = 0;
         this.onchange = null;
+        this.onsubmit = null;
 
-        this._slider
+        window.addEventListener("resize", () => this.move(this._position));
 
         function sliderMouseMove(e: FingerEvent, s: Slider) {
             let rect = s._slider.getBoundingClientRect();
@@ -187,12 +208,7 @@ class Slider {
                 document["_slider"] = this;
                 this._knob.addClass("pressed");
                 sliderMouseMove(e, this);
-            });
-
-            this._slider.addEventListener("touchstart", e => {
-                document["_slider"] = this;
-                this._knob.addClass("pressed");
-                sliderMouseMove(e, this);
+                e.stopPropagation();
             });
 
             if (isUndefined(window["_slider"])) {
@@ -216,6 +232,7 @@ class Slider {
                 document["_slider"] = this;
                 this._knob.addClass("pressed");
                 sliderMouseMove(e, this);
+                e.stopPropagation();
             });
 
             if (isUndefined(window["_slider"])) {
