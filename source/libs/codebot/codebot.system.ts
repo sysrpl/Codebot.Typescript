@@ -398,17 +398,6 @@ function fetchPost(request: string, body: object | string) {
 }
 
 /**
- * Takes a MessageEvent and converts the data to an object or array.
- * @param e The MessageEvent to parse
- * @returns A new json or array recevied as a message
- */
-function parseEvent(e: MessageEvent): any {
-    let json = e.data;
-    json = json.replace(/\\n/g, "\n").replace(/\\r/g, "\r");
-    return JSON.parse(json);
-}
-
-/**
  * Creates a connection to the server allowing you to receive event notifications
  * @param endpoint The endpoint location on the server broadcasting events
  * @param onevent Your event handler for any new events the are receieved
@@ -439,7 +428,7 @@ function subscribeEvent(endpoint: string, onevent: Action<any>, onconnect: Proc 
     }, 10_000);
 
     eventSource.onopen = () => onconnect?.();
-    eventSource.onmessage = e => onevent(parseEvent(e));
+    eventSource.onmessage = e => onevent(JSON.parse(e.data));
     eventSource.onerror = () => {
         if (eventSource.readyState === EventSource.CLOSED && !retrying) {
             retrying = true;
