@@ -403,9 +403,9 @@ function fetchPost(request: string, body: object | string) {
  * @returns A new json or array recevied as a message
  */
 function parseEvent(e: MessageEvent): any {
-        let json = e.data;
-        json = json.replace(/\\n/g, "\n").replace(/\\r/g, "\r");
-        return JSON.parse(json);
+    let json = e.data;
+    json = json.replace(/\\n/g, "\n").replace(/\\r/g, "\r");
+    return JSON.parse(json);
 }
 
 /**
@@ -414,8 +414,40 @@ function parseEvent(e: MessageEvent): any {
  * @param onevent Your event handler for any new events the are receieved
  * @returns The new EventSource connected to the endpoint
  */
-function subscribeEvent(endpoint: string, onevent: Action<any> ): EventSource {
+/*function subscribeEvent(endpoint: string, onevent: Action<any>): EventSource {
     let eventSource = new EventSource(endpoint);
     eventSource.onmessage = e => onevent(parseEvent(e));
+    eventSource.onerror = () => {
+        if (eventSource.readyState === EventSource.CLOSED) {
+            eventSource.close();
+            setTimeout(() => subscribeEvent(endpoint, onevent), 60_000);
+        }
+    };
+    return eventSource;
+}*/
+function subscribeEvent(endpoint: string, onevent: Action<any>, onconnect: Proc = null): EventSource {
+    let eventSource = new EventSource(endpoint);
+    let retrying = false;
+
+    let healthCheck = setInterval(() => {
+        if (eventSource.readyState === EventSource.CLOSED && !retrying) {
+            retrying = true;
+            clearInterval(healthCheck);
+            eventSource.close();
+            setTimeout(() => subscribeEvent(endpoint, onevent, onconnect), 2_000);
+        }
+    }, 10_000);
+
+    eventSource.onopen = () => onconnect?.();
+    eventSource.onmessage = e => onevent(parseEvent(e));
+    eventSource.onerror = () => {
+        if (eventSource.readyState === EventSource.CLOSED && !retrying) {
+            retrying = true;
+            clearInterval(healthCheck);
+            eventSource.close();
+            setTimeout(() => subscribeEvent(endpoint, onevent, onconnect), 2_000);
+        }
+    };
+
     return eventSource;
 }
