@@ -62,14 +62,16 @@ class ScrollArea {
     private boxMouseDown = (e: MouseEvent) => {
         if (this.momentumTimer)
             clearInterval(this.momentumTimer);
+        let me = this;
+        setTimeout(() => { me.scrolling = false; }, 100);
         this.momentumTimer = 0;
         this.isDown = true;
-        this.scrolling = false;
         this.startY = e.pageY - this.box.offsetTop;
         this.scrollTop = this.box.scrollTop;
         this.lastY = this.startY;
         this.lastTime = Date.now();
         this.velocity = 0;
+
         //this.box.style.cursor = 'grabbing';
         e.preventDefault();
     }

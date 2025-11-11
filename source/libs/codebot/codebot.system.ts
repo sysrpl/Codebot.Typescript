@@ -363,14 +363,27 @@ function getCookie(name: string): string | null {
     return null;
 }
 
+/**
+ * And event handler that receives an object or array
+ */
 type FetchAction = Action<any>;
 
+/**
+ * Sends a request to the server asynchronously return data to your event handlers
+ * @param request The url where your query is sent
+ * @param action Your event handler receiving the response of a an object or array
+ */
 function fetchJson(request: string, action: FetchAction) {
     fetch(request)
         .then(r => r.json())
         .then(d => action(d));
 }
 
+/**
+ * Posts a request to the server asynchronously
+ * @param request The url where data is posted
+ * @param body The data to be posted, either a string of object
+ */
 function fetchPost(request: string, body: object | string) {
     let s: string;
     if (isString(body))
@@ -382,4 +395,27 @@ function fetchPost(request: string, body: object | string) {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: s
     });
+}
+
+/**
+ * Takes a MessageEvent and converts the data to an object or array.
+ * @param e The MessageEvent to parse
+ * @returns A new json or array recevied as a message
+ */
+function parseEvent(e: MessageEvent): any {
+        let json = e.data;
+        json = json.replace(/\\n/g, "\n").replace(/\\r/g, "\r");
+        return JSON.parse(json);
+}
+
+/**
+ * Creates a connection to the server allowing you to receive event notifications
+ * @param endpoint The endpoint location on the server broadcasting events
+ * @param onevent Your event handler for any new events the are receieved
+ * @returns The new EventSource connected to the endpoint
+ */
+function subscribeEvent(endpoint: string, onevent: Action<any> ): EventSource {
+    let eventSource = new EventSource(endpoint);
+    eventSource.onmessage = e => onevent(parseEvent(e));
+    return eventSource;
 }
