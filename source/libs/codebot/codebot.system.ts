@@ -398,23 +398,12 @@ function fetchPost(request: string, body: object | string) {
 }
 
 /**
- * Creates a connection to the server allowing you to receive event notifications
+ * Creates a lasting connection to the server allowing you to receive event notifications
  * @param endpoint The endpoint location on the server broadcasting events
- * @param onevent Your event handler for any new events the are receieved
- * @returns The new EventSource connected to the endpoint
- */
-/*function subscribeEvent(endpoint: string, onevent: Action<any>): EventSource {
-    let eventSource = new EventSource(endpoint);
-    eventSource.onmessage = e => onevent(parseEvent(e));
-    eventSource.onerror = () => {
-        if (eventSource.readyState === EventSource.CLOSED) {
-            eventSource.close();
-            setTimeout(() => subscribeEvent(endpoint, onevent), 60_000);
-        }
-    };
-    return eventSource;
+ * @param onevent Your event handler for any new events that are receieved
+ * @param onconnect Option event that is fired each time the connection is re-established
 }*/
-function subscribeEvent(endpoint: string, onevent: Action<any>, onconnect: Proc = null): EventSource {
+function subscribeEvent(endpoint: string, onevent: Action<any>, onconnect: Proc = null) {
     let eventSource = new EventSource(endpoint);
     let retrying = false;
 
@@ -437,6 +426,4 @@ function subscribeEvent(endpoint: string, onevent: Action<any>, onconnect: Proc 
             setTimeout(() => subscribeEvent(endpoint, onevent, onconnect), 2_000);
         }
     };
-
-    return eventSource;
 }
