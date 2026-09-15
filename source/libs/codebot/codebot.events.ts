@@ -52,7 +52,8 @@ class Messages {
         Messages.items.push({ "name": name, "onconnect": onconnect, "onmessage": onmessage });
     }
 
-    public static connect(endpoint: string) {
-        subscribeEvent(endpoint, Messages.notifyConnect, Messages.notifyMessage);
+    /** Connect to an event endpoint, returning a function that closes the connection */
+    public static connect(endpoint: string): Proc {
+        return subscribeEvent(endpoint, Messages.notifyConnect, Messages.notifyMessage);
     }
 }

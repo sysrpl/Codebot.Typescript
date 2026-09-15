@@ -405,15 +405,27 @@ function fetchPost(request: string, body: object | string) {
  * @param endpoint The endpoint location on the server broadcasting events
  * @param onconnect Your event that handler is fired each time the connection is re-established
  * @param onmessage Your event handler for any messages that are received
+ * @returns A function that closes the connection and stops it from reconnecting
  */
-function subscribeEvent(endpoint: string, onconnect: Proc | null, onmessage: AnyAction | null) {
+function subscribeEvent(endpoint: string, onconnect: Proc | null, onmessage: AnyAction | null): Proc {
     let eventSource = null;
     let dead = false;
+    let closed = false;
+
+    function safeParse(s: string): any {
+        try {
+            return JSON.parse(s);
+        } catch (e) {
+            console.error("Bad JSON:", s);
+            console.error(new Error().stack);
+            throw e;
+        }
+    }
 
     function recreate() {
         eventSource = new EventSource(endpoint);
         eventSource.onopen = () => onconnect?.();
-        eventSource.onmessage = (e: MessageEvent) => onmessage?.(JSON.parse(e.data));
+        eventSource.onmessage = (e: MessageEvent) => onmessage?.(safeParse(e.data));
         eventSource.onerror = () => dead = true;
     }
 
@@ -425,14 +437,32 @@ function subscribeEvent(endpoint: string, onconnect: Proc | null, onmessage: Any
         }
     }
 
-    document.addEventListener("visibilitychange", () => {
+    function visible() {
         if (document.visibilityState === "visible") {
             eventSource?.close();
             dead = false;
             recreate();
         }
-    });
+    }
 
+    document.addEventListener("visibilitychange", visible);
     recreate();
-    setInterval(heartbeat, 5_000);
+    let timer = setInterval(heartbeat, 5_000);
+
+    return () => {
+        if (closed)
+            return;
+        closed = true;
+        clearInterval(timer);
+        document.removeEventListener("visibilitychange", visible);
+        onconnect = null;
+        onmessage = null;
+        if (eventSource) {
+            eventSource.onopen = null;
+            eventSource.onmessage = null;
+            eventSource.onerror = null;
+            eventSource.close();
+        }
+        eventSource = null;
+    };
 }

@@ -8,6 +8,8 @@ enum SliderOrientation {
 class Slider {
     private _slider: HTMLElement;
     private _knob: HTMLElement;
+    private _fill: HTMLElement | null;
+    private _filled: boolean;
     private _associate: HTMLElement | null;
     private _position: number;
     private _min: number;
@@ -38,7 +40,12 @@ class Slider {
             let percent = (this._position - this.min) / range;
             if (this._inverted)
                 percent = 1 - percent;
-            this._knob.style.top = (height * percent).toString() + "px";
+            let top = height * percent;
+            this._knob.style.top = top.toString() + "px";
+            if (this._filled) {
+                this._fill.style.top = this._knob.style.top;
+                this._fill.style.height = (height - top + 22).toString() + "px";
+            }
         }
     }
 
@@ -138,7 +145,12 @@ class Slider {
         return document as any;
     }
 
-    constructor(slider: string, associate?: string) {
+    /** Create a slider inside an element
+     * @param slider The element which holds the slider.
+     * @param associate An optional element which displays the position.
+     * @param filled When true a vertical slider shows a fill element below its knob.
+     */
+    constructor(slider: string, associate?: string, filled: boolean = false) {
         let knob = document.createElement("div");
         knob.classList.add("knob");
         this._slider = get(slider);
@@ -146,6 +158,15 @@ class Slider {
         this._slider["slider"] = this;
         this._knob = knob;
         this._associate = associate ? get(associate) : null;
+        this._filled = filled;
+        this._fill = null;
+        if (this._filled) {
+            let fill = document.createElement("div");
+            fill.classList.add("fill");
+            fill.style.pointerEvents = "none";
+            this._slider.appendChild(fill);
+            this._fill = fill;
+        }
         this._position = 0;
         this._min = 0;
         this._max = 100;

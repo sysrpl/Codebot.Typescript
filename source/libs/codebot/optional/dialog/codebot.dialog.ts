@@ -245,3 +245,17 @@ function hideDialog() {
 function currentDialog(): Dialog {
     return window["_currentdialog"] as Dialog;;
 }
+
+/** Shake the current dialog left then right, for example after a wrong password.
+ * The page's stylesheet defines the .shakeleft and .shakeright classes. */
+function shakeDialog() {
+    let d = currentDialog();
+    if (isUndefined(d))
+        return;
+    let e = get(d.id);
+    if (isUndefined(e) || e == null)
+        return;
+    setTimeout(() => { e.addClass("shakeleft") }, 150);
+    setTimeout(() => { e.removeClass("shakeleft").addClass("shakeright") }, 300);
+    setTimeout(() => { e.removeClass("shakeright") }, 450);
+}
