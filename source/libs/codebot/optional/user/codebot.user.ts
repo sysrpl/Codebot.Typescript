@@ -11,7 +11,7 @@ class User {
      * @param connected A callback notifying you that the list has been received.
      */
     connect(connected: Proc) {
-        sendWebRequest("/?method=users", (request) => {
+        sendWebRequest("/?action=users", (request) => {
             this._users = JSON.parse(request.responseText);
             if (this.isAnynomous)
                 this._name = this._users[0];
@@ -30,7 +30,7 @@ class User {
             password: password ? password : (get("#password") as HTMLInputElement).value,
             redirect: false
         }
-        postWebRequest("/?method=login", data, (request) => {
+        postWebRequest("/?action=login", data, (request) => {
             let success = request.responseText == "OK"; 
             if (complete)
                 complete(success);
@@ -61,9 +61,9 @@ class User {
      */
     logout(complete?: Proc): void {
         if (complete)
-            sendWebRequest("/?method=logout", () =>  complete());
+            sendWebRequest("/?action=logout", () =>  complete());
         else
-            sendWebRequest("/?method=logout", () =>  navigate("/"));
+            sendWebRequest("/?action=logout", () =>  navigate("/"));
     }
 
     /** Returns true if the user was not logged in. */

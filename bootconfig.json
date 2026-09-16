@@ -3,9 +3,11 @@
         "target": "es6",
         "sourceMap": true,
         "declaration": true,
+        "rootDir": "source/boot",
         "declarationDir": "source/typings",
         "outDir": "build",
-        "stripInternal": true
+        "stripInternal": true,
+        "strict": false
     },
     "include": [
         "source/boot/boot.ts"

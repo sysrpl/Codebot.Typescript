@@ -406,11 +406,15 @@ function fetchPost(request: string, body: object | string) {
  * @param onconnect Your event that handler is fired each time the connection is re-established
  * @param onmessage Your event handler for any messages that are received
  * @returns A function that closes the connection and stops it from reconnecting
+ * @remarks If the server refuses the connection with a 401 or a 403, listening
+ * stops for good rather than retrying every few seconds against a door that is
+ * not going to open. Every other failure keeps reconnecting as before.
  */
 function subscribeEvent(endpoint: string, onconnect: Proc | null, onmessage: AnyAction | null): Proc {
     let eventSource = null;
     let dead = false;
     let closed = false;
+    let probing = false;
 
     function safeParse(s: string): any {
         try {
@@ -422,14 +426,63 @@ function subscribeEvent(endpoint: string, onconnect: Proc | null, onmessage: Any
         }
     }
 
+    /** Close for good, whether we were asked to or turned away. */
+    function shutdown() {
+        if (closed)
+            return;
+        closed = true;
+        clearInterval(timer);
+        document.removeEventListener("visibilitychange", visible);
+        onconnect = null;
+        onmessage = null;
+        if (eventSource) {
+            eventSource.onopen = null;
+            eventSource.onmessage = null;
+            eventSource.onerror = null;
+            eventSource.close();
+        }
+        eventSource = null;
+    }
+
+    /** EventSource reports a failure without saying what it was, so when the
+     * browser has given up on its own, ask the endpoint directly. A 401 or a 403
+     * means the server turned us away - the roles behind the connection have
+     * changed, or the session has gone - and reconnecting will only be refused
+     * again. Anything else is treated as a blip and left to the heartbeat. */
+    function checkRefused() {
+        if (probing || closed)
+            return;
+        probing = true;
+        let controller = new AbortController();
+        fetch(endpoint, { signal: controller.signal, headers: { "Accept": "text/event-stream" } })
+            .then(response => {
+                // Only the status is wanted, never the stream behind it
+                controller.abort();
+                probing = false;
+                if (response.status === 401 || response.status === 403) {
+                    console.warn(`Event ${endpoint} refused with ${response.status}, no longer listening`);
+                    shutdown();
+                }
+            })
+            .catch(() => probing = false);
+    }
+
     function recreate() {
         eventSource = new EventSource(endpoint);
         eventSource.onopen = () => onconnect?.();
         eventSource.onmessage = (e: MessageEvent) => onmessage?.(safeParse(e.data));
-        eventSource.onerror = () => dead = true;
+        eventSource.onerror = () => {
+            dead = true;
+            // A closed state means the browser will not retry by itself, which is
+            // what it does for any answer that was not a good event stream
+            if (eventSource && eventSource.readyState === EventSource.CLOSED)
+                checkRefused();
+        };
     }
 
     function heartbeat() {
+        if (closed)
+            return;
         if (eventSource.readyState === EventSource.CLOSED || dead) {
             eventSource?.close();
             dead = false;
@@ -449,20 +502,5 @@ function subscribeEvent(endpoint: string, onconnect: Proc | null, onmessage: Any
     recreate();
     let timer = setInterval(heartbeat, 5_000);
 
-    return () => {
-        if (closed)
-            return;
-        closed = true;
-        clearInterval(timer);
-        document.removeEventListener("visibilitychange", visible);
-        onconnect = null;
-        onmessage = null;
-        if (eventSource) {
-            eventSource.onopen = null;
-            eventSource.onmessage = null;
-            eventSource.onerror = null;
-            eventSource.close();
-        }
-        eventSource = null;
-    };
+    return shutdown;
 }

@@ -2,9 +2,12 @@
     "compilerOptions": {
         "target": "es6",
         "sourceMap": true,
+        "rootDir": "source",
         "outFile": "build/app.js",
         "removeComments": true,
-        "lib": ["dom", "es6"]
+        "lib": ["dom", "es6"],
+        "ignoreDeprecations": "6.0",
+        "strict": false
     },
     "include": [
         "**/app/app.ts"

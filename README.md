@@ -173,6 +173,8 @@ The first function you give to ``subscribe`` is called each time the connection 
 
 The library looks after the connection for you. If the connection fails it opens a new one within 5 seconds. And whenever someone returns to your page's tab it opens a fresh connection, because a phone or tablet that has been asleep can be left with a connection that looks open but no longer works. If a message arrives that is not valid json, the message is written to the browser console so you can see what the server sent.
 
+There is one failure it does not retry. If the server refuses the connection with a 401 or a 403 - the roles behind it have changed, or the session has gone - the library stops listening for good and writes a note to the console, rather than knocking every 5 seconds at a door that is not going to open. A page that wants to recover from this should send the visitor to sign in again.
+
 ### Closing a Connection
 
 ``connect`` returns a function which closes the connection. Call it when your page no longer wants to hear from the server, for example when someone signs out:

@@ -1,3 +1,4 @@
+"use strict";
 function get(query) {
     if (typeof query == "string")
         return document.querySelector(query);
@@ -61,37 +62,6 @@ if (!String.prototype.endsWith) {
     };
 }
 class Boot {
-    /** @internal */
-    constructor() {
-        /** @internal */
-        this.included = false;
-        /** @internal */
-        this.loaded = false;
-        /** @internal */
-        this.requestCount = 0;
-        /** @internal */
-        this.sources = [];
-        /** @internal */
-        this.moduleCount = 0;
-        /** @internal */
-        this.modules = [];
-        /** @internal */
-        this.requireCount = 0;
-        /** @internal */
-        this.requires = [];
-        if (window["boot"])
-            return;
-        let me = this;
-        window["boot"] = me;
-        me.processIncludes();
-        window.addEventListener("DOMContentLoaded", () => {
-            let script = document.createElement("script");
-            script.type = "text/javascript";
-            script.onload = () => me.processUses();
-            document.body.appendChild(script);
-            script.src = this.app();
-        });
-    }
     /** @internal */
     start() {
         if (this.included && this.loaded) {
@@ -265,6 +235,37 @@ class Boot {
                 return (_a = meta.getAttribute("content")) !== null && _a !== void 0 ? _a : "";
         }
         return "/typescript/build/app.js";
+    }
+    /** @internal */
+    constructor() {
+        /** @internal */
+        this.included = false;
+        /** @internal */
+        this.loaded = false;
+        /** @internal */
+        this.requestCount = 0;
+        /** @internal */
+        this.sources = [];
+        /** @internal */
+        this.moduleCount = 0;
+        /** @internal */
+        this.modules = [];
+        /** @internal */
+        this.requireCount = 0;
+        /** @internal */
+        this.requires = [];
+        if (window["boot"])
+            return;
+        let me = this;
+        window["boot"] = me;
+        me.processIncludes();
+        window.addEventListener("DOMContentLoaded", () => {
+            let script = document.createElement("script");
+            script.type = "text/javascript";
+            script.onload = () => me.processUses();
+            document.body.appendChild(script);
+            script.src = this.app();
+        });
     }
     open(url, onload, state) {
         let request = new XMLHttpRequest();
